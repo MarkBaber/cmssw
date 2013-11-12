@@ -85,5 +85,10 @@
   <class name="std::vector<L1TriggerError>"/>
   <class name="edm::Wrapper<std::vector<L1TriggerError> >"/>
 
+ <class name="L1TrackPrimaryVertex" ClassVersion="10">
+  <version ClassVersion="10" checksum="1883304891"/>
+ </class>
+ <class name="std::vector<L1TrackPrimaryVertex>"/>
+ <class name="edm::Wrapper<std::vector<L1TrackPrimaryVertex> >"/>
 
 </lcgdict>

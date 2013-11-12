@@ -19,6 +19,8 @@
 #include "DataFormats/L1Trigger/interface/L1HFRings.h"
 #include "DataFormats/L1Trigger/interface/L1HFRingsFwd.h"
 #include "DataFormats/L1Trigger/interface/L1TriggerError.h"
+#include "DataFormats/L1Trigger/interface/L1TrackPrimaryVertex.h"
+
 #include "DataFormats/Common/interface/Wrapper.h"
 #include "DataFormats/Common/interface/RefVector.h"
 #include "DataFormats/Common/interface/RefProd.h"
@@ -76,6 +78,9 @@ namespace {
      L1TriggerError l1tErr;
      L1TriggerErrorCollection l1tErrColl;
      edm::Wrapper<L1TriggerErrorCollection> w_l1terr;
+
+     L1TrackPrimaryVertex trzvtx;
+     edm::Wrapper<L1TrackPrimaryVertexCollection> trzvtxColl;
 
   };
 }
