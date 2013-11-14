@@ -16,8 +16,8 @@ class L1TrackPrimaryVertex {
  L1TrackPrimaryVertex(float z, float s) : zvertex(z), sum(s) { }
 
 
-    float getZvertex() { return zvertex ; } 
-    float getSum() { return sum ; }
+    float getZvertex() const { return zvertex ; } 
+    float getSum() const { return sum ; }
 
  private:
    float zvertex;
