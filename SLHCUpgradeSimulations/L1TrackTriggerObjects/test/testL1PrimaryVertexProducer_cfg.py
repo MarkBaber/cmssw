@@ -38,10 +38,14 @@ process.pL1Tracks = cms.Path( process.BeamSpotFromSim*process.L1Tracks )
 
 # --- Run the L1PrimaryVertex producer :
 
+# the vtx is calculated from tracks that have | z | < ZMAX and chi2 < CHI2MAX.
+# The vtx maximises e.g. Sum (PT^2)  where the sum runs over tracks that
+# are within | z - z_track | < DeltaZ  of the tested vertex.
+
 process.L1TrackPrimaryVertex = cms.EDProducer('L1TrackPrimaryVertexProducer',
-     ZMAX = cms.double ( 25. ) ,
-     ZSTEP = cms.double( 0.05 ),
-     CHI2MAX = cms.double( 100. )
+     ZMAX = cms.double ( 25. ) ,	# in cm
+     CHI2MAX = cms.double( 100. ),
+     DeltaZ = cms.double( 0.05 )    	# in cm
 )
 
 process.p = cms.Path( process.L1TrackPrimaryVertex )

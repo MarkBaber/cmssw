@@ -85,7 +85,7 @@ class L1TrackPrimaryVertexProducer : public edm::EDProducer {
       // ----------member data ---------------------------
 
 	float ZMAX;	// in cm
-	float ZSTEP;	// in cm
+	float DeltaZ;	// in cm
 	float CHI2MAX;
 
         const StackedTrackerGeometry*                   theStackedGeometry;
@@ -119,7 +119,7 @@ L1TrackPrimaryVertexProducer::L1TrackPrimaryVertexProducer(const edm::ParameterS
    //now do what ever other initialization is needed
   
   ZMAX = (float)iConfig.getParameter<double>("ZMAX");
-  ZSTEP = (float)iConfig.getParameter<double>("ZSTEP");
+  DeltaZ = (float)iConfig.getParameter<double>("DeltaZ");
   CHI2MAX = (float)iConfig.getParameter<double>("CHI2MAX");
 
 
@@ -215,7 +215,7 @@ float L1TrackPrimaryVertexProducer::MaxPtVertex(const edm::Handle<L1TkTrackColle
         z = z/10.  ;   // z in cm
         float sum = SumPtVertex(L1TkTrackHandle, z, nStubsmin, nPSmin, ptmin, imode);
         if (sumMax >0 && sum == sumMax) {
-          cout << " Several vertices have the same sum " << zvtxmax << " " << z << " " << sumMax << endl;
+          //cout << " Note: Several vertices have the same sum " << zvtxmax << " " << z << " " << sumMax << endl;
         }
    
         if (sum > sumMax) {
@@ -248,7 +248,7 @@ float L1TrackPrimaryVertexProducer::SumPtVertex(const edm::Handle<L1TkTrackColle
     if (pt < ptmin) continue;
     if (fabs(ztr) > ZMAX ) continue;
     if (chi2 > CHI2MAX) continue;
-    if ( fabs(ztr - z) > ZSTEP) continue;   // eg ZSTEP = 0.05 cm
+    if ( fabs(ztr - z) > DeltaZ) continue;   // eg DeltaZ = 1 mm
 
 
 	// get the number of stubs and the number of stubs in PS layers
