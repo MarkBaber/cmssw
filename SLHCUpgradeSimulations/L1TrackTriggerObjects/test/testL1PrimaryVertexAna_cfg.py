@@ -9,7 +9,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
-    'file:example.root'
+    #'file:example.root'
+    'file:example_withEtMiss.root'
     )
 )
 
@@ -17,7 +18,8 @@ process.source = cms.Source("PoolSource",
 
 
 process.ana = cms.EDAnalyzer( 'L1TrackTriggerObjectsAnalyzer' ,
-    L1VtxLabel = cms.InputTag("L1TrackPrimaryVertex")
+    L1VtxLabel = cms.InputTag("L1TrackPrimaryVertex"),
+    L1EtMissLabel = cms.InputTag("L1TrackEtMiss","MET")
 )
 
 

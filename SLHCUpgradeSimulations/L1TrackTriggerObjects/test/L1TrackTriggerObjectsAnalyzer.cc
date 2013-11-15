@@ -31,7 +31,6 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/Common/interface/Handle.h"
-#include "DataFormats/L1Trigger/interface/L1TrackPrimaryVertex.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Utilities/interface/InputTag.h"
@@ -42,10 +41,16 @@
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 
+#include "DataFormats/L1Trigger/interface/L1TrackPrimaryVertex.h"
+#include "DataFormats/L1Trigger/interface/L1TrackEtMissParticle.h"
+#include "DataFormats/L1Trigger/interface/L1TrackEtMissParticleFwd.h"
+
+
 #include "TFile.h"
 #include "TH1F.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
+using namespace l1extra;
 
 
 
@@ -73,10 +78,14 @@ class L1TrackTriggerObjectsAnalyzer : public edm::EDAnalyzer {
 
       // ----------member data ---------------------------
 
+	// to test the L1TrackPrimaryVertex :
 	edm::InputTag L1VtxLabel;
 	TH1F* h_zgen;
 	TH1F* h_dz1;
 	TH1F* h_dz2;
+
+	// for L1TrackEtmiss:
+	edm::InputTag L1EtMissLabel ;
 };
 
 //
@@ -107,6 +116,7 @@ L1TrackTriggerObjectsAnalyzer::L1TrackTriggerObjectsAnalyzer(const edm::Paramete
    h_dz2 = fs -> make<TH1F>("h_dz2",";z_{L1} - z_{gen} (cm); Evts",nbins, x1, x2);
 
   L1VtxLabel = iConfig.getParameter<edm::InputTag>("L1VtxLabel") ;
+  L1EtMissLabel = iConfig.getParameter<edm::InputTag>("L1EtMissLabel");
 
 }
 
@@ -171,6 +181,8 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
  h_zgen -> Fill( zvtx_gen );
 
 
+	// ----------------------------------------------------------------------
+	//
         // retrieve the L1 vertices
         
  edm::Handle<L1TrackPrimaryVertexCollection> L1VertexHandle;
@@ -185,13 +197,28 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 
  for (vtxIter = L1VertexHandle->begin(); vtxIter != L1VertexHandle->end(); ++vtxIter) {
     float z = vtxIter -> getZvertex();
-    //float sum = vtxIter -> getSum();
-    //std::cout << " a vertex with  z = sum " << z << " " << sum << std::endl;
+    float sum = vtxIter -> getSum();
+    std::cout << " a vertex with  z = sum " << z << " " << sum << std::endl;
     ivtx ++;
     if (ivtx == 1) h_dz1 -> Fill( z - zvtx_gen) ;
     if (ivtx == 2) h_dz2 -> Fill( z - zvtx_gen);
  }  
 
+	//
+        // ----------------------------------------------------------------------
+	// retrieve the EtMiss objects
+	//
+
+ edm::Handle<L1TrackEtMissParticleCollection> L1TrackEtMissHandle;
+ iEvent.getByLabel(L1EtMissLabel, L1TrackEtMissHandle);
+
+ std::vector<L1TrackEtMissParticle>::const_iterator etmIter;
+ for (etmIter = L1TrackEtMissHandle -> begin(); etmIter != L1TrackEtMissHandle->end(); ++etmIter) {
+	float etmis = etmIter -> et();
+	const edm::Ref< L1TrackPrimaryVertexCollection > vtxRef = etmIter -> getVtxRef();
+	float zvtx = vtxRef -> getZvertex();
+	std::cout << " ETmiss = " << etmis << " for zvtx = " << zvtx << std::endl;
+ }
 
 }
 

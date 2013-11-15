@@ -1,4 +1,4 @@
-<library   file="L1TrackPrimaryVertexProducer.cc" name="L1TrackPrimaryVertexPlugin">
+<library   file="*.cc" name="L1TrackPrimaryVertexPlugin">
   <use   name="SLHCUpgradeSimulations/L1TrackTrigger"/>
   <use   name="SimDataFormats/SLHC"/>
   <use   name="DataFormats/L1Trigger"/>

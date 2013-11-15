@@ -4,7 +4,7 @@ process = cms.Process("VTX")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
 
 from SLHCUpgradeSimulations.L1TrackTriggerObjects.ttbarFiles_p1_cfi import *
 

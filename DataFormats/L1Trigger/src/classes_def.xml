@@ -90,5 +90,16 @@
  </class>
  <class name="std::vector<L1TrackPrimaryVertex>"/>
  <class name="edm::Wrapper<std::vector<L1TrackPrimaryVertex> >"/>
+  <class name="edm::Ref<std::vector<L1TrackPrimaryVertex>,L1TrackPrimaryVertex,edm::refhelper::FindUsingAdvance<std::vector<L1TrackPrimaryVertex>,L1TrackPrimaryVertex> >"/>
+
+
+  <class name="l1extra::L1TrackEtMissParticle" ClassVersion="12">
+   <version ClassVersion="12" checksum="3363942833"/>
+  </class>
+  <class name="std::vector<l1extra::L1TrackEtMissParticle>"/>
+ <class name="edm::Wrapper<l1extra::L1TrackEtMissParticle>"/>
+  <class name="edm::Wrapper<std::vector<l1extra::L1TrackEtMissParticle> >"/>
+
+
 
 </lcgdict>
