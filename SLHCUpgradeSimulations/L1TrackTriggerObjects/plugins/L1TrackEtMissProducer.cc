@@ -187,6 +187,11 @@ L1TrackEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     float sumPx = 0;
     float sumPy = 0;
     float etTot = 0;
+
+    double sumPx_PU = 0;
+    double sumPy_PU = 0;
+    double etTot_PU = 0;
+
   	for (trackIter = L1TkTrackHandle->begin(); trackIter != L1TkTrackHandle->end(); ++trackIter) {
  
     	    float pt = trackIter->getMomentum().perp();
@@ -196,7 +201,6 @@ L1TrackEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     	    if (pt < Ptmin) continue;
     	    if (fabs(ztr) > ZMAX ) continue;
     	    if (chi2 > CHI2MAX) continue;
-    	    if ( fabs(ztr - zVTX) > DeltaZ) continue;   // eg DeltaZ = 1 mm
                 
             int nstubs = 0;
             std::vector< edm::Ptr< L1TkStub_PixelDigi_ > > theStubs = trackIter ->getStubPtrs();
@@ -211,18 +215,31 @@ L1TrackEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
             }
             if (nstubs < nStubsmin) continue;
 
-	    sumPx += trackIter->getMomentum().x();
-	    sumPy += trackIter->getMomentum().y();
-	    etTot += pt ;
+            if ( fabs(ztr - zVTX) <= DeltaZ) {   // eg DeltaZ = 1 mm
+
+	    	sumPx += trackIter->getMomentum().x();
+	    	sumPy += trackIter->getMomentum().y();
+	    	etTot += pt ;
+	    }
+	    else   {	// PU sums
+                sumPx_PU += trackIter->getMomentum().x();
+                sumPy_PU += trackIter->getMomentum().y();
+                etTot_PU += pt ;
+	    }
+
 
     	} // end loop over tracks
      float et = sqrt( sumPx*sumPx + sumPy*sumPy );
      math::XYZTLorentzVector missingEt( -sumPx, -sumPy, 0, et);
 
+     double etmiss_PU = sqrt( sumPx_PU*sumPx_PU + sumPy_PU*sumPy_PU );
+
      int ibx = 0;
      result -> push_back(  L1TrackEtMissParticle( missingEt,
 				 L1TrackEtMissParticle::kMET,
 				 etTot,
+				 etmiss_PU,
+				 etTot_PU,
 				 vtxRef,
 				 ibx )
 		         ) ;

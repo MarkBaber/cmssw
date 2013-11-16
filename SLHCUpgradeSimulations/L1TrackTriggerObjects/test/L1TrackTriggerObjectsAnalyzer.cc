@@ -217,7 +217,8 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 	float etmis = etmIter -> et();
 	const edm::Ref< L1TrackPrimaryVertexCollection > vtxRef = etmIter -> getVtxRef();
 	float zvtx = vtxRef -> getZvertex();
-	std::cout << " ETmiss = " << etmis << " for zvtx = " << zvtx << std::endl;
+        float etMissPU = etmIter -> etMissPU();
+	std::cout << " ETmiss = " << etmis << " for zvtx = " << zvtx << " and ETmiss from PU = " << etMissPU << std::endl;
  }
 
 }

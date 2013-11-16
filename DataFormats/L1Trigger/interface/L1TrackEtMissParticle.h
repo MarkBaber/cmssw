@@ -39,6 +39,8 @@ namespace l1extra {
         const LorentzVector& p4,
         EtMissType type,
         const double& etTotal,
+	const double& etMissPU,
+	const double& etTotalPU,
         const edm::Ref< L1TrackPrimaryVertexCollection >& aVtxRef = edm::Ref< L1TrackPrimaryVertexCollection >(),
         int bx = 0 ) ;
 
@@ -55,6 +57,12 @@ namespace l1extra {
       // For type = kET, this is total ET; for type = kHT, this is total HT
       const double& etTotal() const
         { return etTot_ ; }
+
+	// EtMiss and EtTot from PU vertices
+	double etMissPU() const
+	  { return etMissPU_ ; }
+	double etTotalPU() const 
+	  { return etTotalPU_ ; }
 
       int bx() const
         { return bx_ ; }
@@ -76,6 +84,8 @@ namespace l1extra {
 
       EtMissType type_ ;
       double etTot_ ;
+      double etMissPU_ ;
+      double etTotalPU_ ;
 
       edm::Ref< L1TrackPrimaryVertexCollection > vtxRef_ ;
 
