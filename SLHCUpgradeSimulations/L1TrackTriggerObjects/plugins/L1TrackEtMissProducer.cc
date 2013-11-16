@@ -85,6 +85,8 @@ class L1TrackEtMissProducer : public edm::EDProducer {
 	float DeltaZ;	// in cm
 	float CHI2MAX;
 	float Ptmin;	// in GeV
+        int nStubsmin;
+
 
         //const StackedTrackerGeometry*                   theStackedGeometry;
 
@@ -122,7 +124,7 @@ L1TrackEtMissProducer::L1TrackEtMissProducer(const edm::ParameterSet& iConfig)
   DeltaZ = (float)iConfig.getParameter<double>("DeltaZ");
   CHI2MAX = (float)iConfig.getParameter<double>("CHI2MAX");
   Ptmin = (float)iConfig.getParameter<double>("Ptmin");
-
+  nStubsmin = iConfig.getParameter<int>("nStubsmin");
 
   produces<L1TrackEtMissParticleCollection>("MET");
 
@@ -196,6 +198,19 @@ L1TrackEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     	    if (chi2 > CHI2MAX) continue;
     	    if ( fabs(ztr - zVTX) > DeltaZ) continue;   // eg DeltaZ = 1 mm
                 
+            int nstubs = 0;
+            std::vector< edm::Ptr< L1TkStub_PixelDigi_ > > theStubs = trackIter ->getStubPtrs();
+            int tmp_trk_nstub = (int) theStubs.size();
+            if ( tmp_trk_nstub < 0) continue;
+            // loop over the stubs
+            for (unsigned int istub=0; istub<(unsigned int)theStubs.size(); istub++) {
+                bool genuine = theStubs.at(istub)->isGenuine();
+                if (genuine) {
+                  nstubs ++;
+                }
+            }
+            if (nstubs < nStubsmin) continue;
+
 	    sumPx += trackIter->getMomentum().x();
 	    sumPy += trackIter->getMomentum().y();
 	    etTot += pt ;

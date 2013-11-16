@@ -9,7 +9,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
-    'file:example.root'
+    #'file:example.root'
+    '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/TTbar/BE5D/m1_TTbar_BE5D.root'
     )
 )
 
@@ -32,7 +33,8 @@ process.L1TrackEtMiss = cms.EDProducer('L1TrackEtMissProducer',
      ZMAX = cms.double ( 25. ) ,	# in cm
      CHI2MAX = cms.double( 100. ),
      DeltaZ = cms.double( 0.05 ),    	# in cm
-     Ptmin = cms.double( 2. )
+     Ptmin = cms.double( 2. ),
+     nStubsmin = cms.int32( 4 )
 )
 
 process.p = cms.Path( process.L1TrackEtMiss )
