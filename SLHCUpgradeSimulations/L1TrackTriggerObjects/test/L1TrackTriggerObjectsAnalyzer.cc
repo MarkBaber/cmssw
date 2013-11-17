@@ -248,7 +248,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 
  if ( L1TrackElectronsHandle.isValid() ) {
     for (eleIter = L1TrackElectronsHandle -> begin(); eleIter != L1TrackElectronsHandle->end(); ++eleIter) {
-	float et = eleIter -> et();
+	float et = eleIter -> pt();
 	float phi = eleIter -> phi();
 	float eta = eleIter -> eta();
 	const edm::Ref< L1EmParticleCollection > EGref = eleIter -> getEGRef();

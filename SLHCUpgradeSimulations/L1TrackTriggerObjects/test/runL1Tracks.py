@@ -1,16 +1,15 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("VTX")
+process = cms.Process("TRA")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
 
-from SLHCUpgradeSimulations.L1TrackTriggerObjects.ttbarFiles_p1_cfi import *
+from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import *
 
 process.source = cms.Source("PoolSource",
-    # replace 'myfile.root' with the source file you want to use
-    fileNames = ttbarFiles_p1
+    fileNames = singleElectronFiles
 )
 
 
@@ -20,7 +19,10 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS261_V3::All', '')
 
 
+# ---------------------------------------------------------------------------
+#
 # ---- Run the L1Tracking :
+
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('IOMC.EventVertexGenerators.VtxSmearedGauss_cfi')
 
@@ -35,20 +37,9 @@ process.L1Tracks.geometry = cms.untracked.string('BE5D')
 
 process.pL1Tracks = cms.Path( process.BeamSpotFromSim*process.L1Tracks )
 
+#
+# ---------------------------------------------------------------------------
 
-# --- Run the L1PrimaryVertex producer :
-
-# the vtx is calculated from tracks that have | z | < ZMAX and chi2 < CHI2MAX.
-# The vtx maximises e.g. Sum (PT^2)  where the sum runs over tracks that
-# are within | z - z_track | < DeltaZ  of the tested vertex.
-
-process.L1TrackPrimaryVertex = cms.EDProducer('L1TrackPrimaryVertexProducer',
-     ZMAX = cms.double ( 25. ) ,	# in cm
-     CHI2MAX = cms.double( 100. ),
-     DeltaZ = cms.double( 0.05 )    	# in cm
-)
-
-process.p = cms.Path( process.L1TrackPrimaryVertex )
 
 process.Out = cms.OutputModule( "PoolOutputModule",
     fileName = cms.untracked.string( "example_w_Tracks.root" ),
@@ -56,7 +47,7 @@ process.Out = cms.OutputModule( "PoolOutputModule",
     outputCommands = cms.untracked.vstring( 'drop *')
 )
 
-process.Out.outputCommands.append( 'keep *_*_*_VTX' )
+process.Out.outputCommands.append( 'keep *_*_*_TRA' )
 process.Out.outputCommands.append('keep *_generator_*_*')
 process.Out.outputCommands.append('keep *_rawDataCollector_*_*')
 process.Out.outputCommands.append('keep *_L1TkStubsFromPixelDigis_StubsPass_*')

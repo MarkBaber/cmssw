@@ -103,7 +103,6 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
  iEvent.getByLabel(L1TrackInputTag, L1TkTrackHandle);
  L1TkTrackCollectionType::const_iterator trackIter;
 
-
  int ieg = 0;
  for (egIter = EGammaHandle->begin();  egIter != EGammaHandle->end(); ++egIter) {
 
@@ -140,11 +139,11 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	    edm::Ptr< L1TkTrackType > L1TrackPtr( L1TkTrackHandle, itrack) ;
 	    //edm::Ptr< L1TkTrackCollectionType > L1TrackPtr = L1TkTrackHandle -> ptrAt( itrack );
 	    
-	    float pt = L1TrackPtr -> getMomentum().perp();
  	    float px = L1TrackPtr -> getMomentum().x();
 	    float py = L1TrackPtr -> getMomentum().y();
 	    float pz = L1TrackPtr -> getMomentum().z();
-            math::XYZTLorentzVector TrackP4(px,py,pz,pt);
+	    float e = sqrt( px*px + py*py + pz*pz );	// massless particle
+            math::XYZTLorentzVector TrackP4(px,py,pz,e);
 	    int ibx = 0;
  	    L1TrackEmParticle trkEm( TrackP4, 
 				 EGammaRef,

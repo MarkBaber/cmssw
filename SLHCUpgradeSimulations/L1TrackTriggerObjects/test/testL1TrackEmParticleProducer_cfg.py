@@ -4,7 +4,7 @@ process = cms.Process("Ele")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
@@ -21,7 +21,7 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS261_V3::All', '')
 
 
-# --- creates l1extra objects (here for the Run1 trigger !)
+# --- creates l1extra objects for L1EGamma (here for the Run1 trigger !)
 
         # raw2digi to get the gct digis
 process.load('Configuration.StandardSequences.RawToDigi_cff')
@@ -32,6 +32,7 @@ process.L1Reco = cms.Path( process.l1extraParticles )
 
 
 # --- Now run the L1TrackEmParticleProducer 
+
 process.L1TrackElectron = cms.EDProducer("L1TrackEmParticleProducer",
 	L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
 	L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
@@ -47,8 +48,9 @@ process.Out = cms.OutputModule( "PoolOutputModule",
     outputCommands = cms.untracked.vstring( 'drop *')
 )
 
-process.Out.outputCommands.append( 'keep *_*_*_Ele' )
-process.Out.outputCommands.append('keep *_generator_*_*')
+#process.Out.outputCommands.append( 'keep *_*_*_Ele' )
+#process.Out.outputCommands.append('keep *_generator_*_*')
+process.Out.outputCommands.append('keep *')
 
 process.FEVToutput_step = cms.EndPath(process.Out)
 
