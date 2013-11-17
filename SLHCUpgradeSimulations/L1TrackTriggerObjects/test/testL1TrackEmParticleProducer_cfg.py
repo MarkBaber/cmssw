@@ -1,10 +1,10 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("ETMISS")
+process = cms.Process("Ele")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
 
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
@@ -15,38 +15,38 @@ process.source = cms.Source("PoolSource",
 )
 
 
-# ---- Global Tag :
-#process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-#from Configuration.AlCa.GlobalTag import GlobalTag
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS261_V3::All', '')
+process.load("Configuration.Geometry.GeometryIdeal_cff")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS261_V3::All', '')
 
 
+# --- creates l1extra objects (here for the Run1 trigger !)
 
-# --- Run the L1PrimaryVertex producer :
+        # raw2digi to get the gct digis
+process.load('Configuration.StandardSequences.RawToDigi_cff')
+process.p0 = cms.Path( process.RawToDigi )
+	# run L1Reco
+process.load('Configuration.StandardSequences.L1Reco_cff')
+process.L1Reco = cms.Path( process.l1extraParticles )
 
-# the vtx is calculated from tracks that have | z | < ZMAX and chi2 < CHI2MAX.
-# The vtx maximises e.g. Sum (PT^2)  where the sum runs over tracks that
-# are within | z - z_track | < DeltaZ  of the tested vertex.
 
-process.L1TrackElectron = cms.EDProducer('L1TrackEmParticleProducer',
-     L1EGammaLabel = cms.InputTag("")
-     ZMAX = cms.double ( 25. ) ,	# in cm
-     CHI2MAX = cms.double( 100. ),
-     DeltaZ = cms.double( 0.05 ),    	# in cm
-     Ptmin = cms.double( 2. ),
-     nStubsmin = cms.int32( 4 )
+# --- Now run the L1TrackEmParticleProducer 
+process.L1TrackElectron = cms.EDProducer("L1TrackEmParticleProducer",
+	L1TrackLabel = cms.InputTag("L1Tracks","Level1TkTracks"),
+	L1EGammaLabel = cms.InputTag("l1extraParticles","NonIsolated")
 )
 
-process.p = cms.Path( process.L1TrackEtMiss )
+process.p = cms.Path( process.L1TrackElectron )
+
 
 process.Out = cms.OutputModule( "PoolOutputModule",
-    fileName = cms.untracked.string( "example_withEtMiss.root" ),
+    fileName = cms.untracked.string( "example.root" ),
     fastCloning = cms.untracked.bool( False ),
     outputCommands = cms.untracked.vstring( 'drop *')
 )
 
-process.Out.outputCommands.append( 'keep *_*_*_VTX' )
-process.Out.outputCommands.append( 'keep *_*_*_ETMISS' )
+process.Out.outputCommands.append( 'keep *_*_*_Ele' )
 process.Out.outputCommands.append('keep *_generator_*_*')
 
 process.FEVToutput_step = cms.EndPath(process.Out)
