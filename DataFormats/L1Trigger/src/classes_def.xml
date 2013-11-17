@@ -100,6 +100,19 @@
  <class name="edm::Wrapper<l1extra::L1TrackEtMissParticle>"/>
   <class name="edm::Wrapper<std::vector<l1extra::L1TrackEtMissParticle> >"/>
 
+  <class name="l1extra::L1TrackEmParticle" ClassVersion="10">
+   <version ClassVersion="10" checksum="2019457791"/>
+  </class>
+  <class name="std::vector<l1extra::L1TrackEmParticle>"/>
+  <class name="edm::Wrapper<std::vector<l1extra::L1TrackEmParticle> >"/>
+  <class name="edm::Ref<std::vector<l1extra::L1TrackEmParticle>,l1extra::L1TrackEmParticle,edm::refhelper::FindUsingAdvance<std::vector<l1extra::L1TrackEmParticle>,l1extra::L1TrackEmParticle> >"/>
+<!--
+  <class name="edm::RefVector<std::vector<l1extra::L1TrackEmParticle>,l1extra::L1TrackEmParticle,edm::refhelper::FindUsingAdvance<std::vector<l1extra::L1TrackEmParticle>,l1extra::L1TrackEmParticle> >"/>
+  <class name="std::vector<edm::Ref<std::vector<l1extra::L1TrackEmParticle>,l1extra::L1TrackEmParticle,edm::refhelper::FindUsingAdvance<std::vector<l1extra::L1TrackEmParticle>,l1extra::L1TrackEmParticle> > >"/>
+  <class name="edm::reftobase::Holder<reco::Candidate, edm::Ref<std::vector<l1extra::L1TrackEmParticle>,l1extra::L1TrackEmParticle,edm::refhelper::FindUsingAdvance<std::vector<l1extra::L1TrackEmParticle>,l1extra::L1TrackEmParticle> > >" />
+-->
+
+
 
 
 </lcgdict>

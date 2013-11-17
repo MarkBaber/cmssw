@@ -24,6 +24,9 @@
 #include "DataFormats/L1Trigger/interface/L1TrackEtMissParticle.h"
 #include "DataFormats/L1Trigger/interface/L1TrackEtMissParticleFwd.h"
 
+#include "DataFormats/L1Trigger/interface/L1TrackEmParticle.h"
+#include "DataFormats/L1Trigger/interface/L1TrackEmParticleFwd.h"
+
 #include "DataFormats/Common/interface/Wrapper.h"
 #include "DataFormats/Common/interface/RefVector.h"
 #include "DataFormats/Common/interface/RefProd.h"
@@ -100,6 +103,13 @@ namespace {
      //edm::reftobase::Holder<reco::Candidate, l1extra::L1TrackEtMissParticleRef> rtbTkm1;
      //edm::reftobase::Holder<reco::Candidate, l1extra::L1TrackEtMissParticleRefProd> rtbTkm2;
 
+	// L1TrackEmParticle
+     l1extra::L1TrackEmParticleCollection trkemColl ;
+     edm::Wrapper<l1extra::L1TrackEmParticleCollection> w_trkemColl;
+     l1extra::L1TrackEmParticleRef reftrkEm ;
+     //l1extra::L1TrackEmParticleRefVector refVectrkEmColl ;
+     //l1extra::L1TrackEmParticleVectorRef vecReftrkEmColl ;
+     //edm::reftobase::Holder<reco::Candidate, l1extra::L1TrackEmParticleRef> rtbtrke;
 
 
 
