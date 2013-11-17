@@ -22,12 +22,6 @@ process.source = cms.Source("PoolSource",
 
 
 
-# --- Run the L1PrimaryVertex producer :
-
-# the vtx is calculated from tracks that have | z | < ZMAX and chi2 < CHI2MAX.
-# The vtx maximises e.g. Sum (PT^2)  where the sum runs over tracks that
-# are within | z - z_track | < DeltaZ  of the tested vertex.
-
 process.L1TrackEtMiss = cms.EDProducer('L1TrackEtMissProducer',
      L1VtxLabel = cms.InputTag("L1TrackPrimaryVertex"),
      ZMAX = cms.double ( 25. ) ,	# in cm

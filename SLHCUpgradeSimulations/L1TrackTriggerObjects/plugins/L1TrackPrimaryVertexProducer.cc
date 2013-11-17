@@ -45,7 +45,7 @@
 #include "DataFormats/SiPixelDetId/interface/StackedTrackerDetId.h"
 
 
-#include "DataFormats/L1Trigger/interface/L1TrackPrimaryVertex.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackPrimaryVertex.h"
 
 
 //

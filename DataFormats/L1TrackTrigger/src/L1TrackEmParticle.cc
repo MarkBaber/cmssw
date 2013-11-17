@@ -4,7 +4,7 @@
 // Class  :     L1TrackEmParticle
 // 
 
-#include "DataFormats/L1Trigger/interface/L1TrackEmParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
 
 
 using namespace l1extra ;

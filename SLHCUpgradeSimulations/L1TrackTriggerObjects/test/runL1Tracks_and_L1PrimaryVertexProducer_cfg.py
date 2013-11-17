@@ -42,22 +42,32 @@ process.pL1Tracks = cms.Path( process.BeamSpotFromSim*process.L1Tracks )
 # The vtx maximises e.g. Sum (PT^2)  where the sum runs over tracks that
 # are within | z - z_track | < DeltaZ  of the tested vertex.
 
+# The primary vertex producer has to be run together with the L1Tracking,
+# or on a file on which the tracker digis have been kept.
+# This is because one needs to access the number of stubs in the PS
+# modules for the L1Tracks, when one reconstructs the vertex.
+# To get this information, one must have access to the tracker digis.
+
+# the configuration parameters below are not yet optimized !
+
 process.L1TrackPrimaryVertex = cms.EDProducer('L1TrackPrimaryVertexProducer',
      ZMAX = cms.double ( 25. ) ,	# in cm
      CHI2MAX = cms.double( 100. ),
-     DeltaZ = cms.double( 0.05 )    	# in cm
+     DeltaZ = cms.double( 0.05 )    	# in cm.  1 mm may be better 
 )
 
 process.p = cms.Path( process.L1TrackPrimaryVertex )
 
 process.Out = cms.OutputModule( "PoolOutputModule",
-    fileName = cms.untracked.string( "example_w_Tracks.root" ),
+    fileName = cms.untracked.string( "example_w_Tracks_and_vertex.root" ),
     fastCloning = cms.untracked.bool( False ),
     outputCommands = cms.untracked.vstring( 'drop *')
 )
 
 process.Out.outputCommands.append( 'keep *_*_*_VTX' )
 process.Out.outputCommands.append('keep *_generator_*_*')
+process.Out.outputCommands.append('keep *_*gen*_*_*')
+process.Out.outputCommands.append('keep *_*Gen*_*_*')
 process.Out.outputCommands.append('keep *_rawDataCollector_*_*')
 process.Out.outputCommands.append('keep *_L1TkStubsFromPixelDigis_StubsPass_*')
 

@@ -5,6 +5,7 @@
 <use name="FWCore/PluginManager"/>
 <use name="FWCore/ParameterSet"/>
 <use name="DataFormats/L1Trigger"/>
+<use name="DataFormats/L1TrackTrigger"/>
 <use name="SimDataFormats/SLHC"/>
   <use   name="SimGeneral/HepPDTRecord"/>
   <use   name="SimDataFormats/GeneratorProducts"/>

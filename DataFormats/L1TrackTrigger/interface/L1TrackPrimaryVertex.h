@@ -1,5 +1,5 @@
-#ifndef DataFormats_L1Trigger_L1TrackPrimaryVertex_h
-#define DataFormats_L1Trigger_L1TrackPrimaryVertex_h
+#ifndef L1TrackTrigger_L1TrackPrimaryVertex_h
+#define L1TrackTrigger_L1TrackPrimaryVertex_h
 
 
 // Nov 12, 2013

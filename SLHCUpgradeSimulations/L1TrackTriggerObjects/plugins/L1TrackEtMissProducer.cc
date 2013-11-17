@@ -45,8 +45,8 @@
 #include "DataFormats/SiPixelDetId/interface/StackedTrackerDetId.h"
 
 
-#include "DataFormats/L1Trigger/interface/L1TrackEtMissParticle.h"
-#include "DataFormats/L1Trigger/interface/L1TrackEtMissParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticleFwd.h"
 
 
 using namespace l1extra;

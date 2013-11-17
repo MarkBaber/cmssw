@@ -41,11 +41,11 @@
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 
-#include "DataFormats/L1Trigger/interface/L1TrackPrimaryVertex.h"
-#include "DataFormats/L1Trigger/interface/L1TrackEtMissParticle.h"
-#include "DataFormats/L1Trigger/interface/L1TrackEtMissParticleFwd.h"
-#include "DataFormats/L1Trigger/interface/L1TrackEmParticle.h"
-#include "DataFormats/L1Trigger/interface/L1TrackEmParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackPrimaryVertex.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticleFwd.h"
 
 
 

@@ -6,10 +6,13 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
 
-from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import *
+#from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import *
+from SLHCUpgradeSimulations.L1TrackTriggerObjects.ttbarFiles_p1_cfi import *
+
 
 process.source = cms.Source("PoolSource",
-    fileNames = singleElectronFiles
+    #fileNames = singleElectronFiles
+    fileNames = ttbarFiles_p1
 )
 
 
@@ -49,6 +52,8 @@ process.Out = cms.OutputModule( "PoolOutputModule",
 
 process.Out.outputCommands.append( 'keep *_*_*_TRA' )
 process.Out.outputCommands.append('keep *_generator_*_*')
+process.Out.outputCommands.append('keep *_*gen*_*_*')
+process.Out.outputCommands.append('keep *_*Gen*_*_*')
 process.Out.outputCommands.append('keep *_rawDataCollector_*_*')
 process.Out.outputCommands.append('keep *_L1TkStubsFromPixelDigis_StubsPass_*')
 

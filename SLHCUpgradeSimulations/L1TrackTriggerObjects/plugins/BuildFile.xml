@@ -2,6 +2,7 @@
   <use   name="SLHCUpgradeSimulations/L1TrackTrigger"/>
   <use   name="SimDataFormats/SLHC"/>
   <use   name="DataFormats/L1Trigger"/>
+  <use   name="DataFormats/L1TrackTrigger"/>
   <use   name="CommonTools/UtilAlgos"/>
   <use   name="hepmc"/>
   <use   name="root"/>

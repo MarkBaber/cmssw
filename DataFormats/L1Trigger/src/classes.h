@@ -20,13 +20,6 @@
 #include "DataFormats/L1Trigger/interface/L1HFRingsFwd.h"
 #include "DataFormats/L1Trigger/interface/L1TriggerError.h"
 
-#include "DataFormats/L1Trigger/interface/L1TrackPrimaryVertex.h"
-#include "DataFormats/L1Trigger/interface/L1TrackEtMissParticle.h"
-#include "DataFormats/L1Trigger/interface/L1TrackEtMissParticleFwd.h"
-
-#include "DataFormats/L1Trigger/interface/L1TrackEmParticle.h"
-#include "DataFormats/L1Trigger/interface/L1TrackEmParticleFwd.h"
-
 #include "DataFormats/Common/interface/Wrapper.h"
 #include "DataFormats/Common/interface/RefVector.h"
 #include "DataFormats/Common/interface/RefProd.h"
@@ -84,37 +77,6 @@ namespace {
      L1TriggerError l1tErr;
      L1TriggerErrorCollection l1tErrColl;
      edm::Wrapper<L1TriggerErrorCollection> w_l1terr;
-
-	// L1 Primary Vertex
-     L1TrackPrimaryVertex trzvtx;
-     edm::Wrapper<L1TrackPrimaryVertexCollection> trzvtxColl;
-     edm::Ref< L1TrackPrimaryVertexCollection > trkvtxRef ;
-
-
-	// L1TrackEtMiss... following L1EtMiss...
-     l1extra::L1TrackEtMissParticle TketMiss ;
-     l1extra::L1TrackEtMissParticleCollection TketMissColl ;
-     edm::Wrapper<l1extra::L1TrackEtMissParticle> w_TketMiss;
-     edm::Wrapper<l1extra::L1TrackEtMissParticleCollection> w_TketMissColl;
-     //l1extra::L1TrackEtMissParticleRef refTkEtMiss ;
-     //l1extra::L1TrackEtMissParticleRefVector refTkVecEtMiss ;
-     //l1extra::L1TrackEtMissParticleVectorRef vecTkRefEtMissColl ;
-     //l1extra::L1TrackEtMissParticleRefProd refTkProdEtMiss ;
-     //edm::reftobase::Holder<reco::Candidate, l1extra::L1TrackEtMissParticleRef> rtbTkm1;
-     //edm::reftobase::Holder<reco::Candidate, l1extra::L1TrackEtMissParticleRefProd> rtbTkm2;
-
-	// L1TrackEmParticle
-     l1extra::L1TrackEmParticleCollection trkemColl ;
-     edm::Wrapper<l1extra::L1TrackEmParticleCollection> w_trkemColl;
-     l1extra::L1TrackEmParticleRef reftrkEm ;
-     //l1extra::L1TrackEmParticleRefVector refVectrkEmColl ;
-     //l1extra::L1TrackEmParticleVectorRef vecReftrkEmColl ;
-     //edm::reftobase::Holder<reco::Candidate, l1extra::L1TrackEmParticleRef> rtbtrke;
-
-
-
-
-
 
   };
 }

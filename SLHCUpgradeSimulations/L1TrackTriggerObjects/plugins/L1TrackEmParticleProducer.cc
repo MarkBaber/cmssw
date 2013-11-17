@@ -21,8 +21,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/L1Trigger/interface/L1TrackEmParticle.h"
-#include "DataFormats/L1Trigger/interface/L1TrackEmParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticleFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
