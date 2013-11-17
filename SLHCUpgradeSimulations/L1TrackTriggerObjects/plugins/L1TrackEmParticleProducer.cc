@@ -30,6 +30,9 @@
 // for L1Tracks:
 #include "SimDataFormats/SLHC/interface/StackedTrackerTypes.h"
 
+#include <string>
+#include "TMath.h"
+
 
 using namespace l1extra ;
 
@@ -59,8 +62,9 @@ class L1TrackEmParticleProducer : public edm::EDProducer {
       //virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
 
       // ----------member data ---------------------------
-	edm::InputTag L1EGammaLabel;
-	edm::InputTag L1TrackLabel;
+	edm::InputTag L1EGammaInputTag;
+	edm::InputTag L1TrackInputTag;
+	std::string label;
 
 } ;
 
@@ -71,10 +75,12 @@ class L1TrackEmParticleProducer : public edm::EDProducer {
 L1TrackEmParticleProducer::L1TrackEmParticleProducer(const edm::ParameterSet& iConfig)
 {
 
-   L1EGammaLabel = iConfig.getParameter<edm::InputTag>("L1EGammaLabel") ;
-   L1TrackLabel = iConfig.getParameter<edm::InputTag>("L1TrackLabel");
+   L1EGammaInputTag = iConfig.getParameter<edm::InputTag>("L1EGammaInputTag") ;
+   L1TrackInputTag = iConfig.getParameter<edm::InputTag>("L1TrackInputTag");
+   label = iConfig.getParameter<std::string>("label");
+   
 
-   produces<L1TrackEmParticleCollection>();
+   produces<L1TrackEmParticleCollection>(label);
 }
 
 L1TrackEmParticleProducer::~L1TrackEmParticleProducer() {
@@ -89,12 +95,12 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
  std::auto_ptr<L1TrackEmParticleCollection> result(new L1TrackEmParticleCollection);
 
  edm::Handle<L1EmParticleCollection> EGammaHandle;
- iEvent.getByLabel(L1EGammaLabel,EGammaHandle);
+ iEvent.getByLabel(L1EGammaInputTag,EGammaHandle);
  std::vector<L1EmParticle>::const_iterator egIter ;
 
  edm::Handle<L1TkTrackCollectionType> L1TkTrackHandle;
  //iEvent.getByLabel("L1Tracks","Level1TkTracks",L1TkTrackHandle);
- iEvent.getByLabel(L1TrackLabel, L1TkTrackHandle);
+ iEvent.getByLabel(L1TrackInputTag, L1TkTrackHandle);
  L1TkTrackCollectionType::const_iterator trackIter;
 
 
@@ -104,47 +110,61 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     edm::Ref< L1EmParticleCollection > EGammaRef( EGammaHandle, ieg );
     ieg ++;
 
+    float eta = egIter -> eta();
+    float phi = egIter -> phi();
+    
 	// match the L1EG object with a L1Track
-	// here dummy : I take the hightest PT track
+	// here dummy : I simply take the closest track
+	// and require that DR < 0.5
 
-	float ptmax = 0;
+	float drmin = 999;
 	int itr = 0;
 	int itrack = -1;
 	for (trackIter = L1TkTrackHandle->begin(); trackIter != L1TkTrackHandle->end(); ++trackIter) {
-		float pt = trackIter->getMomentum().perp();	
-	        if ( pt > ptmax) {
-		  ptmax = pt;
+		float Eta = trackIter->getMomentum().eta();
+		float Phi = trackIter->getMomentum().phi();
+		float deta = eta - Eta;
+		float dphi = phi - Phi;
+		if (dphi < 0) dphi = dphi + 2.*TMath::Pi();
+		if (dphi > TMath::Pi()) dphi = 2.*TMath::Pi() - dphi;
+		float dR = sqrt( deta*deta + dphi*dphi );
+		if (dR < drmin) {
+		  drmin = dR;
 		  itrack = itr;
 		}
 		itr ++ ;
 	}
-	edm::Ref< L1TkTrackCollectionType > L1TrackRef( L1TkTrackHandle, itrack) ;
-	float pt = L1TrackRef -> getMomentum().perp();
-	//float eta = L1TrackRef -> getMomentum().eta();
-	//float phi = L1TrackRef -> getMomentum().phi();
-	//float dummyMass = 0. ;
-	
- 	//math::PtEtaPhiMLorentzVector TrackP4( pt, eta, phi, dummyMass );
- 	float px = L1TrackRef -> getMomentum().x();
-	float py = L1TrackRef -> getMomentum().y();
-	float pz = L1TrackRef -> getMomentum().z();
-        math::XYZTLorentzVector TrackP4(px,py,pz,pt);
-	int ibx = 0;
- 	L1TrackEmParticle trkEm( TrackP4, 
+
+	if (drmin < 0.5 ) {	// found a L1Track matched to the L1EG object
+
+	    edm::Ptr< L1TkTrackType > L1TrackPtr( L1TkTrackHandle, itrack) ;
+	    //edm::Ptr< L1TkTrackCollectionType > L1TrackPtr = L1TkTrackHandle -> ptrAt( itrack );
+	    
+	    float pt = L1TrackPtr -> getMomentum().perp();
+ 	    float px = L1TrackPtr -> getMomentum().x();
+	    float py = L1TrackPtr -> getMomentum().y();
+	    float pz = L1TrackPtr -> getMomentum().z();
+            math::XYZTLorentzVector TrackP4(px,py,pz,pt);
+	    int ibx = 0;
+ 	    L1TrackEmParticle trkEm( TrackP4, 
 				 EGammaRef,
+				 L1TrackPtr, 
 				 ibx );
 		// zvertex of the L1Track:
-        float z = trackIter->getVertex().z();
-	trkEm.setTrkzVtx( z );
+            float z = trackIter->getVertex().z();
+	    trkEm.setTrkzVtx( z );
 
 		// isolation w.r.t. tracks :
- 	float isol = -999;	// dummy
-	trkEm.setTrkzVtx( isol );
+ 	    float isol = -999;	// dummy
+	    trkEm.setTrkzVtx( isol );
 
-	result -> push_back( trkEm );
+	    result -> push_back( trkEm );
+
+	}  // endif drmin < 0.5
+
  }  // end loop over EGamma objects
 
- iEvent.put( result );
+ iEvent.put( result, label );
 
 }
 

@@ -18,9 +18,9 @@ process.source = cms.Source("PoolSource",
 
 
 process.ana = cms.EDAnalyzer( 'L1TrackTriggerObjectsAnalyzer' ,
-    L1VtxLabel = cms.InputTag("L1TrackPrimaryVertex"),
-    L1EtMissLabel = cms.InputTag("L1TrackEtMiss","MET"),
-    L1TrackElectronsLabel = cms.InputTag("L1TrackElectron")
+    L1VtxInputTag = cms.InputTag("L1TrackPrimaryVertex"),
+    L1EtMissInputTag = cms.InputTag("L1TrackEtMiss","MET"),
+    L1TrackElectronsInputTag = cms.InputTag("L1TrackElectron","NonIsolated")
 )
 
 

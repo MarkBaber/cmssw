@@ -72,6 +72,14 @@
   <class pattern="L1TkTrack*" />
   <class pattern="std::vector<L1TkTrack*>" />
   <class pattern="edm::Wrapper<std::vector<L1TkTrack*>>" />
+	<!-- for L1TrackTriggerObjects -->
+  <class pattern="edm::Ptr<L1TkTrack*>"/>
+  <class pattern="std::vector<edm::Ptr<L1TkTrack*>>"/>
+  <class pattern="std::vector<std::vector<edm::Ptr<L1TkTrack*>>>"/>
+  <class pattern="edm::Wrapper<std::vector<std::vector<edm::Ptr<L1TkTrack*>>>>"/>
+  <class pattern="edm::Wrapper<edm::Ptr<L1TkTrack*>>" />
+
+  
 
   <!-- L1TStub -->
   <class pattern="L1TStub*"/>

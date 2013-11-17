@@ -51,7 +51,7 @@ process.L1TrackPrimaryVertex = cms.EDProducer('L1TrackPrimaryVertexProducer',
 process.p = cms.Path( process.L1TrackPrimaryVertex )
 
 process.Out = cms.OutputModule( "PoolOutputModule",
-    fileName = cms.untracked.string( "example.root" ),
+    fileName = cms.untracked.string( "example_w_Tracks.root" ),
     fastCloning = cms.untracked.bool( False ),
     outputCommands = cms.untracked.vstring( 'drop *')
 )

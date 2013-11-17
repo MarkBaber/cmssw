@@ -63,6 +63,10 @@ using namespace l1extra;
 
 class L1TrackTriggerObjectsAnalyzer : public edm::EDAnalyzer {
    public:
+
+  typedef L1TkTrack_PixelDigi_                          L1TkTrackType;
+  typedef std::vector< L1TkTrackType >                               L1TkTrackCollectionType;
+
       explicit L1TrackTriggerObjectsAnalyzer(const edm::ParameterSet&);
       ~L1TrackTriggerObjectsAnalyzer();
 
@@ -82,16 +86,16 @@ class L1TrackTriggerObjectsAnalyzer : public edm::EDAnalyzer {
       // ----------member data ---------------------------
 
 	// to test the L1TrackPrimaryVertex :
-	edm::InputTag L1VtxLabel;
+	edm::InputTag L1VtxInputTag;
 	TH1F* h_zgen;
 	TH1F* h_dz1;
 	TH1F* h_dz2;
 
 	// for L1TrackEtmiss:
-	edm::InputTag L1EtMissLabel ;
+	edm::InputTag L1EtMissInputTag;
 
 	// for L1TrackEmParticles
-	edm::InputTag L1TrackElectronsLabel ;
+	edm::InputTag L1TrackElectronsInputTag;
 };
 
 //
@@ -121,9 +125,9 @@ L1TrackTriggerObjectsAnalyzer::L1TrackTriggerObjectsAnalyzer(const edm::Paramete
    h_dz1 = fs -> make<TH1F>("h_dz1",";z_{L1} - z_{gen} (cm); Evts",nbins,x1,x2);
    h_dz2 = fs -> make<TH1F>("h_dz2",";z_{L1} - z_{gen} (cm); Evts",nbins, x1, x2);
 
-  L1VtxLabel = iConfig.getParameter<edm::InputTag>("L1VtxLabel") ;
-  L1EtMissLabel = iConfig.getParameter<edm::InputTag>("L1EtMissLabel");
-  L1TrackElectronsLabel = iConfig.getParameter<edm::InputTag>("L1TrackElectronsLabel");
+  L1VtxInputTag = iConfig.getParameter<edm::InputTag>("L1VtxInputTag") ;
+  L1EtMissInputTag = iConfig.getParameter<edm::InputTag>("L1EtMissInputTag");
+  L1TrackElectronsInputTag = iConfig.getParameter<edm::InputTag>("L1TrackElectronsInputTag");
 
 }
 
@@ -147,6 +151,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 {
    using namespace edm;
 
+   std::cout << " ----  a new event ----- " << std::endl;
 
 	// First, retrieve the generated primary vertex
 
@@ -194,7 +199,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
         // retrieve the L1 vertices
         
  edm::Handle<L1TrackPrimaryVertexCollection> L1VertexHandle;
- iEvent.getByLabel(L1VtxLabel,L1VertexHandle);
+ iEvent.getByLabel(L1VtxInputTag,L1VertexHandle);
  std::vector<L1TrackPrimaryVertex>::const_iterator vtxIter;
  
  if ( L1VertexHandle.isValid() ) {
@@ -219,7 +224,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 	//
 
  edm::Handle<L1TrackEtMissParticleCollection> L1TrackEtMissHandle;
- iEvent.getByLabel(L1EtMissLabel, L1TrackEtMissHandle);
+ iEvent.getByLabel(L1EtMissInputTag, L1TrackEtMissHandle);
  std::vector<L1TrackEtMissParticle>::const_iterator etmIter;
 
  if (L1TrackEtMissHandle.isValid() ) {
@@ -238,7 +243,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 	//
 
  edm::Handle<L1TrackEmParticleCollection> L1TrackElectronsHandle;
- iEvent.getByLabel(L1TrackElectronsLabel, L1TrackElectronsHandle);
+ iEvent.getByLabel(L1TrackElectronsInputTag, L1TrackElectronsHandle);
  std::vector<L1TrackEmParticle>::const_iterator eleIter ;
 
  if ( L1TrackElectronsHandle.isValid() ) {
@@ -250,8 +255,13 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 	float et_L1Calo = EGref -> et();
 	float eta_calo = EGref -> eta();
 	float phi_calo = EGref -> phi();
+	const edm::Ptr< L1TkTrackType > TrkRef = eleIter -> getTrkPtr();
+	float pt_track = TrkRef -> getMomentum().perp();
+	float phi_track = TrkRef -> getMomentum().phi();
+	float eta_track = TrkRef -> getMomentum().eta();
 	std::cout << "an electron candidate ET eta phi " << et << " " << eta << " " << phi << std::endl;
 	std::cout << "                Calo  ET eta phi " << et_L1Calo << " " << eta_calo << " " << phi_calo << std::endl; 
+	std::cout << "                Track PT eta phi " << pt_track << " " << eta_track << " " << phi_track << std::endl;
     }
  }
 }

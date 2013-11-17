@@ -9,8 +9,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
-    #'file:example.root'
-    '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/TTbar/BE5D/m1_TTbar_BE5D.root'
+    'file:example_w_Tracks.root'
+    #'/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/TTbar/BE5D/m1_TTbar_BE5D.root'
     )
 )
 
@@ -33,8 +33,9 @@ process.L1Reco = cms.Path( process.l1extraParticles )
 
 # --- Now run the L1TrackEmParticleProducer 
 process.L1TrackElectron = cms.EDProducer("L1TrackEmParticleProducer",
-	L1TrackLabel = cms.InputTag("L1Tracks","Level1TkTracks"),
-	L1EGammaLabel = cms.InputTag("l1extraParticles","NonIsolated")
+	L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
+	L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
+	label = cms.string("NonIsolated")
 )
 
 process.p = cms.Path( process.L1TrackElectron )
