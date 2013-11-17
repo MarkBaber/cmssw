@@ -23,11 +23,16 @@ L1TrackEmParticle::L1TrackEmParticle( const LorentzVector& p4,
      bx_ ( bx )  
 {
 
+/*
+        const edm::Ref< L1TrackPrimaryVertexCollection > vtxRef = etmIter -> getVtxRef();
+        float zvtx = vtxRef -> getZvertex();
+*/
+
   if ( egRef_.isNonnull()  ) {
-	//type_ = egRef()->type()  ;
-	//type_ = egRef_.type() ;
-	L1EmParticle eg = 
-	L1EmParticle::EmType typ = egRef.type() ;
+	//const edm::Ref< L1EmParticleCollection > kk = egRef;
+	
+	//L1EmParticle::EmType typ = kk-> type() ;
+        L1EmParticle::EmType typ =  getEGRef() -> type() ;
         if (typ == L1EmParticle::EmType::kIsolated) {
 	  type_ = kIsolated;
 	}

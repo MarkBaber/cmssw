@@ -45,7 +45,7 @@ namespace l1extra {
          EmType type() const
          { return type_ ; }
 
-	 const edm::Ref< L1EmParticleCollection >& egRef() const
+	 const edm::Ref< L1EmParticleCollection >& getEGRef() const
 	 { return egRef_ ; }
 
 	 //const edm::Ref< L1TkTrackCollectionType >& trkRef() const
