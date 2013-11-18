@@ -66,13 +66,24 @@ process.L1Reco = cms.Path( process.l1extraParticles )
 
 # --- Now run the L1TrackEmParticleProducer 
 
-process.L1TrackElectron = cms.EDProducer("L1TrackEmParticleProducer",
+# "photons" :
+
+process.L1TrackPhotons = cms.EDProducer("L1TrackEmParticleProducer",
         L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
         L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
         label = cms.string("NonIsolated")
 )
+process.pPhotons = cms.Path( process.L1TrackPhotons )
 
-process.pEle = cms.Path( process.L1TrackElectron )
+# "electrons" :
+
+process.L1TrackElectrons = cms.EDProducer("L1TrackElectronParticleProducer",
+        L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
+        L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
+        label = cms.string("NonIsolated")
+)
+process.pElectrons = cms.Path( process.L1TrackElectrons )
+
 
 #
 # ---------------------------------------------------------------------------
@@ -84,7 +95,8 @@ process.pEle = cms.Path( process.L1TrackElectron )
 process.ana = cms.EDAnalyzer( 'L1TrackTriggerObjectsAnalyzer' ,
     L1VtxInputTag = cms.InputTag("L1TrackPrimaryVertex"),
     L1EtMissInputTag = cms.InputTag("L1TrackEtMiss","MET"),
-    L1TrackElectronsInputTag = cms.InputTag("L1TrackElectron","NonIsolated")
+    L1TrackElectronsInputTag = cms.InputTag("L1TrackElectrons","NonIsolated"),
+    L1TrackPhotonsInputTag = cms.InputTag("L1TrackPhotons","NonIsolated")
 )
 
 

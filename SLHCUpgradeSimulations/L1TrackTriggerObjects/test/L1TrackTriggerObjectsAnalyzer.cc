@@ -46,6 +46,9 @@
 #include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticleFwd.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticleFwd.h"
+
 
 
 
@@ -95,6 +98,7 @@ class L1TrackTriggerObjectsAnalyzer : public edm::EDAnalyzer {
 	edm::InputTag L1EtMissInputTag;
 
 	// for L1TrackEmParticles
+        edm::InputTag L1TrackPhotonsInputTag;
 	edm::InputTag L1TrackElectronsInputTag;
 };
 
@@ -128,7 +132,7 @@ L1TrackTriggerObjectsAnalyzer::L1TrackTriggerObjectsAnalyzer(const edm::Paramete
   L1VtxInputTag = iConfig.getParameter<edm::InputTag>("L1VtxInputTag") ;
   L1EtMissInputTag = iConfig.getParameter<edm::InputTag>("L1EtMissInputTag");
   L1TrackElectronsInputTag = iConfig.getParameter<edm::InputTag>("L1TrackElectronsInputTag");
-
+  L1TrackPhotonsInputTag = iConfig.getParameter<edm::InputTag>("L1TrackPhotonsInputTag");
 }
 
 
@@ -191,6 +195,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
           }  // end loop over gen vertices
 
      h_zgen -> Fill( zvtx_gen );
+     std::cout << " Generated zvertex : " << zvtx_gen << std::endl;
 
 
 
@@ -203,6 +208,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
  std::vector<L1TrackPrimaryVertex>::const_iterator vtxIter;
  
  if ( L1VertexHandle.isValid() ) {
+     std::cout << " -----  L1TrackPrimaryVertex objects   ----- " << std::endl;
      int ivtx = 0;
 	// several algorithms have been run in the L1TrackPrimaryVertexProducer
 	// hence there is a collection of L1 primary vertices.
@@ -228,6 +234,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
  std::vector<L1TrackEtMissParticle>::const_iterator etmIter;
 
  if (L1TrackEtMissHandle.isValid() ) {
+    std::cout << " -----  L1TrackEtMiss objects  -----  " << std::endl; 
     for (etmIter = L1TrackEtMissHandle -> begin(); etmIter != L1TrackEtMissHandle->end(); ++etmIter) {
 	float etmis = etmIter -> et();
 	const edm::Ref< L1TrackPrimaryVertexCollection > vtxRef = etmIter -> getVtxRef();
@@ -242,28 +249,73 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
         // retrieve the L1TrackEmParticle objects
 	//
 
- edm::Handle<L1TrackEmParticleCollection> L1TrackElectronsHandle;
- iEvent.getByLabel(L1TrackElectronsInputTag, L1TrackElectronsHandle);
- std::vector<L1TrackEmParticle>::const_iterator eleIter ;
+ edm::Handle<L1TrackEmParticleCollection> L1TrackPhotonsHandle;
+ iEvent.getByLabel(L1TrackPhotonsInputTag, L1TrackPhotonsHandle);
+ std::vector<L1TrackEmParticle>::const_iterator phoIter ;
 
- if ( L1TrackElectronsHandle.isValid() ) {
-    for (eleIter = L1TrackElectronsHandle -> begin(); eleIter != L1TrackElectronsHandle->end(); ++eleIter) {
-	float et = eleIter -> pt();
-	float phi = eleIter -> phi();
-	float eta = eleIter -> eta();
-	const edm::Ref< L1EmParticleCollection > EGref = eleIter -> getEGRef();
+ if ( L1TrackPhotonsHandle.isValid() ) {
+    std::cout << " -----   L1TrackEmParticle  objects -----  " << std::endl;
+    for (phoIter = L1TrackPhotonsHandle -> begin(); phoIter != L1TrackPhotonsHandle->end(); ++phoIter) {
+	float et = phoIter -> pt();
+	float phi = phoIter -> phi();
+	float eta = phoIter -> eta();
+        float trkisol = phoIter -> getTrkIsol() ;
+	const edm::Ref< L1EmParticleCollection > EGref = phoIter -> getEGRef();
 	float et_L1Calo = EGref -> et();
 	float eta_calo = EGref -> eta();
 	float phi_calo = EGref -> phi();
-	const edm::Ptr< L1TkTrackType > TrkRef = eleIter -> getTrkPtr();
-	float pt_track = TrkRef -> getMomentum().perp();
-	float phi_track = TrkRef -> getMomentum().phi();
-	float eta_track = TrkRef -> getMomentum().eta();
-	std::cout << "an electron candidate ET eta phi " << et << " " << eta << " " << phi << std::endl;
+
+	std::cout << " a photon candidate ET eta phi trkisol " << et << " " << eta << " " << phi << " " << trkisol << std::endl;
 	std::cout << "                Calo  ET eta phi " << et_L1Calo << " " << eta_calo << " " << phi_calo << std::endl; 
-	std::cout << "                Track PT eta phi " << pt_track << " " << eta_track << " " << phi_track << std::endl;
     }
  }
+
+
+        //
+        // ----------------------------------------------------------------------
+        // retrieve the L1TrackElectronParticle objects
+        //
+
+ edm::Handle<L1TrackElectronParticleCollection> L1TrackElectronsHandle;
+ iEvent.getByLabel(L1TrackElectronsInputTag, L1TrackElectronsHandle);
+ std::vector<L1TrackElectronParticle>::const_iterator eleIter ;
+
+ if ( L1TrackElectronsHandle.isValid() ) {
+    std::cout << " -----   L1TrackElectronParticle  objects -----  " << std::endl;
+    for (eleIter = L1TrackElectronsHandle -> begin(); eleIter != L1TrackElectronsHandle->end(); ++eleIter) {
+        float et = eleIter -> pt();
+        float phi = eleIter -> phi();
+        float eta = eleIter -> eta();
+    	float trkisol = eleIter -> getTrkIsol() ;
+	float ztr = eleIter -> getTrkzVtx() ;
+        std::cout << "an electron candidate ET eta phi trkisol ztr " << et << " " << eta << " " << phi << " " << trkisol << " " << ztr << std::endl;
+
+        const edm::Ref< L1EmParticleCollection > EGref = eleIter -> getEGRef();
+        if ( EGref.isNonnull() ) {
+           float et_L1Calo = EGref -> et();
+           float eta_calo = EGref -> eta();
+           float phi_calo = EGref -> phi();
+           std::cout << "                Calo  ET eta phi " << et_L1Calo << " " << eta_calo << " " << phi_calo << std::endl;
+	}
+	else {
+	    std::cout << " .... edm::Ref to EGamma is unvalid !! ?  " << std::endl;
+	}
+
+        const edm::Ptr< L1TkTrackType > TrkRef = eleIter -> getTrkPtr();
+	if ( TrkRef.isNonnull() ) {
+            float pt_track = TrkRef -> getMomentum().perp();
+            float phi_track = TrkRef -> getMomentum().phi();
+            float eta_track = TrkRef -> getMomentum().eta();
+            float ztrack = TrkRef -> getVertex().z() ;
+            std::cout << "                Track PT eta phi ztr " << pt_track << " " << eta_track << " " << phi_track << " " << ztrack << std::endl;
+	}
+	else {
+	    std::cout << " ... edm::Ptr to L1Tracks is unvalid (e.g. electron was matched to stubs) " << std::endl;
+	}
+    }
+ }
+
+
 }
 
 

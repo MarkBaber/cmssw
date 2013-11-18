@@ -12,6 +12,9 @@
 #include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticleFwd.h"
 
+#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticleFwd.h"
+
 #include "DataFormats/Common/interface/Wrapper.h"
 #include "DataFormats/Common/interface/RefVector.h"
 #include "DataFormats/Common/interface/RefProd.h"
@@ -45,6 +48,12 @@ namespace {
      //l1extra::L1TrackEmParticleRefVector refVectrkEmColl ;
      //l1extra::L1TrackEmParticleVectorRef vecReftrkEmColl ;
      //edm::reftobase::Holder<reco::Candidate, l1extra::L1TrackEmParticleRef> rtbtrke;
+
+        // L1TrackElectronParticle
+     l1extra::L1TrackElectronParticleCollection trkeleColl ;
+     edm::Wrapper<l1extra::L1TrackElectronParticleCollection> w_trkeleColl;
+     l1extra::L1TrackElectronParticleRef reftrkEle ;
+
 
 
   };

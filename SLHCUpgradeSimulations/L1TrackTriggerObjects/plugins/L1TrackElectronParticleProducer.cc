@@ -21,8 +21,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticleFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
@@ -40,14 +40,14 @@ using namespace l1extra ;
 // class declaration
 //
 
-class L1TrackEmParticleProducer : public edm::EDProducer {
+class L1TrackElectronParticleProducer : public edm::EDProducer {
    public:
 
   typedef L1TkTrack_PixelDigi_                          L1TkTrackType;
   typedef std::vector< L1TkTrackType >                               L1TkTrackCollectionType;
 
-      explicit L1TrackEmParticleProducer(const edm::ParameterSet&);
-      ~L1TrackEmParticleProducer();
+      explicit L1TrackElectronParticleProducer(const edm::ParameterSet&);
+      ~L1TrackElectronParticleProducer();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -72,7 +72,7 @@ class L1TrackEmParticleProducer : public edm::EDProducer {
 //
 // constructors and destructor
 //
-L1TrackEmParticleProducer::L1TrackEmParticleProducer(const edm::ParameterSet& iConfig)
+L1TrackElectronParticleProducer::L1TrackElectronParticleProducer(const edm::ParameterSet& iConfig)
 {
 
    L1EGammaInputTag = iConfig.getParameter<edm::InputTag>("L1EGammaInputTag") ;
@@ -80,19 +80,19 @@ L1TrackEmParticleProducer::L1TrackEmParticleProducer(const edm::ParameterSet& iC
    label = iConfig.getParameter<std::string>("label");
    
 
-   produces<L1TrackEmParticleCollection>(label);
+   produces<L1TrackElectronParticleCollection>(label);
 }
 
-L1TrackEmParticleProducer::~L1TrackEmParticleProducer() {
+L1TrackElectronParticleProducer::~L1TrackElectronParticleProducer() {
 }
 
 // ------------ method called to produce the data  ------------
 void
-L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+L1TrackElectronParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
 
- std::auto_ptr<L1TrackEmParticleCollection> result(new L1TrackEmParticleCollection);
+ std::auto_ptr<L1TrackElectronParticleCollection> result(new L1TrackElectronParticleCollection);
 
  edm::Handle<L1EmParticleCollection> EGammaHandle;
  iEvent.getByLabel(L1EGammaInputTag,EGammaHandle);
@@ -108,25 +108,76 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     edm::Ref< L1EmParticleCollection > EGammaRef( EGammaHandle, ieg );
     ieg ++;
 
-    int bx = egIter -> bx() ;
+    int ibx = egIter -> bx();
+    if (ibx != 0) continue;
 
-    if (bx == 0) {
-
-	// calculate the isolation of the L1EG object with
-	// respect to L1Tracks.
-	// here dummy
-
-	float trkisol = -999;
-
-    	const math::XYZTLorentzVector P4 = egIter -> p4() ;
-	L1TrackEmParticle trkEm(  P4,
-				EGammaRef,
-				trkisol,
-				bx );
+    float eta = egIter -> eta();
+    float phi = egIter -> phi();
     
-        result -> push_back( trkEm );
+	// match the L1EG object with a L1Track
+	// here dummy : I simply take the closest track
+	// and require that DR < 0.5
 
-     }  // endif bx==0
+	float drmin = 999;
+	int itr = 0;
+	int itrack = -1;
+	for (trackIter = L1TkTrackHandle->begin(); trackIter != L1TkTrackHandle->end(); ++trackIter) {
+		float Eta = trackIter->getMomentum().eta();
+		float Phi = trackIter->getMomentum().phi();
+		float deta = eta - Eta;
+		float dphi = phi - Phi;
+		if (dphi < 0) dphi = dphi + 2.*TMath::Pi();
+		if (dphi > TMath::Pi()) dphi = 2.*TMath::Pi() - dphi;
+		float dR = sqrt( deta*deta + dphi*dphi );
+		if (dR < drmin) {
+		  drmin = dR;
+		  itrack = itr;
+		}
+		itr ++ ;
+	}
+
+	if (drmin < 0.5 ) {	// found a L1Track matched to the L1EG object
+
+	    edm::Ptr< L1TkTrackType > L1TrackPtr( L1TkTrackHandle, itrack) ;
+	    
+ 	    float px = L1TrackPtr -> getMomentum().x();
+	    float py = L1TrackPtr -> getMomentum().y();
+	    float pz = L1TrackPtr -> getMomentum().z();
+	    float e = sqrt( px*px + py*py + pz*pz );	// massless particle
+            math::XYZTLorentzVector TrackP4(px,py,pz,e);
+
+	    float trkisol = -999; 	// dummy
+
+ 	    L1TrackElectronParticle trkEm( TrackP4, 
+				 EGammaRef,
+				 L1TrackPtr, 
+			         trkisol,
+				 ibx );
+
+	/*
+	Note : to create an L1TrackElectronParticle without a reference to a L1Track 
+	(e.g. when matching the L1EGamma with stubs and not tracks :
+
+	   The 4-momentum of the electron is then probably that of the L1EGamma
+	   object - see L1TrackEmProducer.cc to retrieve P4
+	   One could then do :
+
+	   edm::Ptr< L1TkTrackType > L1TrackPtrNull;     //  null pointer
+	   L1TrackElectronParticle trkEm( P4,
+                                 EGammaRef,
+                                 L1TrackPtrNull, 
+                                 trkisol,
+                                 ibx );
+
+	   and one can set the "z" of the electron, as determined by the 
+	   algorithm, via :
+	   
+	   trkEm.setTrkzVtx( z );
+	*/
+
+	    result -> push_back( trkEm );
+
+	}  // endif drmin < 0.5
 
  }  // end loop over EGamma objects
 
@@ -137,19 +188,19 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 // ------------ method called once each job just before starting event loop  ------------
 void
-L1TrackEmParticleProducer::beginJob()
+L1TrackElectronParticleProducer::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void
-L1TrackEmParticleProducer::endJob() {
+L1TrackElectronParticleProducer::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
 /*
 void
-L1TrackEmParticleProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
+L1TrackElectronParticleProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
 {
 }
 */
@@ -157,7 +208,7 @@ L1TrackEmParticleProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetu
 // ------------ method called when ending the processing of a run  ------------
 /*
 void
-L1TrackEmParticleProducer::endRun(edm::Run&, edm::EventSetup const&)
+L1TrackElectronParticleProducer::endRun(edm::Run&, edm::EventSetup const&)
 {
 }
 */
@@ -165,7 +216,7 @@ L1TrackEmParticleProducer::endRun(edm::Run&, edm::EventSetup const&)
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
 void
-L1TrackEmParticleProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+L1TrackElectronParticleProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 */
@@ -173,14 +224,14 @@ L1TrackEmParticleProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::Even
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
 void
-L1TrackEmParticleProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+L1TrackElectronParticleProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-L1TrackEmParticleProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+L1TrackElectronParticleProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -189,7 +240,7 @@ L1TrackEmParticleProducer::fillDescriptions(edm::ConfigurationDescriptions& desc
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(L1TrackEmParticleProducer);
+DEFINE_FWK_MODULE(L1TrackElectronParticleProducer);
 
 
 

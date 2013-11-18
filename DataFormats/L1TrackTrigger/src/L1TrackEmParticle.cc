@@ -16,11 +16,13 @@ L1TrackEmParticle::L1TrackEmParticle()
 
 L1TrackEmParticle::L1TrackEmParticle( const LorentzVector& p4,
          const edm::Ref< L1EmParticleCollection >& egRef,
-         const edm::Ptr< L1TkTrackType >& trkPtr,
-         int bx)
+         //const edm::Ptr< L1TkTrackType >& trkPtr,
+	 float tkisol ,
+	 int bx )
    : LeafCandidate( ( char ) 0, p4 ),
      egRef_ ( egRef ),
-     trkPtr_ ( trkPtr ),
+     //trkPtr_ ( trkPtr ),
+     TrkIsol_ ( tkisol ) ,
      bx_ ( bx )  
 {
 
@@ -35,6 +37,8 @@ L1TrackEmParticle::L1TrackEmParticle( const LorentzVector& p4,
 	  type_ = kNonIsolated ;
 	}
   }
+
+  
 
 }
 
