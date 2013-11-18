@@ -12,7 +12,6 @@
 #include "DataFormats/Common/interface/Ptr.h"
 
 #include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
-//#include "DataFormats/L1Trigger/interface/L1EmParticle.h"
 
 #include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
 
@@ -35,8 +34,7 @@ namespace l1extra {
 	 L1TrackElectronParticle( const LorentzVector& p4,
 			    const edm::Ref< L1EmParticleCollection >& egRef,
 			    const edm::Ptr< L1TkTrackType >& trkPtr,
-			    float tkisol = -999.,
-			    int bx = 0 ) ;
+			    float tkisol = -999. );
 
 	virtual ~L1TrackElectronParticle() {}
 

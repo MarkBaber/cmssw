@@ -121,8 +121,7 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     	const math::XYZTLorentzVector P4 = egIter -> p4() ;
 	L1TrackEmParticle trkEm(  P4,
 				EGammaRef,
-				trkisol,
-				bx );
+				trkisol );
     
         result -> push_back( trkEm );
 

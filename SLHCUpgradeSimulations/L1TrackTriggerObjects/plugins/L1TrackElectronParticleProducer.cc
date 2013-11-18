@@ -151,8 +151,7 @@ L1TrackElectronParticleProducer::produce(edm::Event& iEvent, const edm::EventSet
  	    L1TrackElectronParticle trkEm( TrackP4, 
 				 EGammaRef,
 				 L1TrackPtr, 
-			         trkisol,
-				 ibx );
+			         trkisol );
 
 	/*
 	Note : to create an L1TrackElectronParticle without a reference to a L1Track 

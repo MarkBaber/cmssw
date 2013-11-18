@@ -17,9 +17,8 @@ L1TrackElectronParticle::L1TrackElectronParticle()
 L1TrackElectronParticle::L1TrackElectronParticle( const LorentzVector& p4,
          const edm::Ref< L1EmParticleCollection >& egRef,
          const edm::Ptr< L1TkTrackType >& trkPtr,
-	 float tkisol,
-	 int bx )
-   : L1TrackEmParticle( p4, egRef, tkisol, bx) ,
+	 float tkisol )
+   : L1TrackEmParticle( p4, egRef, tkisol) ,
      trkPtr_ ( trkPtr )
 
 {
