@@ -354,7 +354,7 @@ SLHCL1ExtraParticlesNewClustering = cms.EDProducer("L1NewEgammaExtraCalibrator",
 
                                                    ## June 2013
                                                    ## New calibration. Corrections computed in bins of |eta| and interpolated with a pol1
-                                                   eGammaEtaPoints = cms.vdouble(0.1250,0.3750,0.6250,0.8750,1.1250,1.3645,1.6145,1.8750,2.1250,2.3750)
+                                                   eGammaEtaPoints = cms.vdouble(0.1250,0.3750,0.6250,0.8750,1.1250,1.3645,1.6145,1.8750,2.1250,2.3750),
                                                    eGammaNewCorr = cms.vdouble(0.0932,0.1016,0.1049,0.1262,0.1569,0.1862,0.2320,0.2765,0.2679,0.2679)
                                                   )
 ## Calibration factors for DATA

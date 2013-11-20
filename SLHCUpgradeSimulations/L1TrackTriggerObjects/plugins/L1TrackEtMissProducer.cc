@@ -208,10 +208,10 @@ L1TrackEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
             if ( tmp_trk_nstub < 0) continue;
             // loop over the stubs
             for (unsigned int istub=0; istub<(unsigned int)theStubs.size(); istub++) {
-                bool genuine = theStubs.at(istub)->isGenuine();
-                if (genuine) {
+                //bool genuine = theStubs.at(istub)->isGenuine();
+                //if (genuine) {
                   nstubs ++;
-                }
+                //}
             }
             if (nstubs < nStubsmin) continue;
 

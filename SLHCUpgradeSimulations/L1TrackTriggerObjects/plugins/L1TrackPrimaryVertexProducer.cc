@@ -200,7 +200,7 @@ L1TrackPrimaryVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup&
 
 
 float L1TrackPrimaryVertexProducer::MaxPtVertex(const edm::Handle<L1TkTrackCollectionType> & L1TkTrackHandle,
- 		float& sum,
+ 		float& Sum,
 		int nStubsmin, int nPSmin, float ptmin, int imode) {
         // return the zvtx corresponding to the max(SumPT)
         // of tracks with at least nPSmin stubs in PS modules
@@ -209,7 +209,7 @@ float L1TrackPrimaryVertexProducer::MaxPtVertex(const edm::Handle<L1TkTrackColle
       float zvtxmax = -999;
       int nIter = (int)(ZMAX * 10. * 2.) ;
       for (int itest = 0; itest <= nIter; itest ++) {
-   
+	
         //float z = -100 + itest;         // z in mm
 	float z = -ZMAX * 10 + itest ;  	// z in mm
         z = z/10.  ;   // z in cm
@@ -222,9 +222,9 @@ float L1TrackPrimaryVertexProducer::MaxPtVertex(const edm::Handle<L1TkTrackColle
            sumMax = sum;
            zvtxmax = z;
         }
-      }
+       }  // end loop over tested z 
    
- sum = sumMax;
+ Sum = sumMax;
  return zvtxmax;
 }  
 
@@ -258,18 +258,21 @@ float L1TrackPrimaryVertexProducer::SumPtVertex(const edm::Handle<L1TkTrackColle
       // get pointers to stubs associated to the L1 track
       std::vector< edm::Ptr< L1TkStub_PixelDigi_ > > theStubs = trackIter ->getStubPtrs();
       int tmp_trk_nstub = (int) theStubs.size();
-      if ( tmp_trk_nstub < 0) continue;
+      if ( tmp_trk_nstub < 0) {
+	std::cout << " ... could not retrieve the vector of stubs in L1TrackPrimaryVertexProducer::SumPtVertex " << std::endl;
+	continue;
+      }
 
       // loop over the stubs
       for (unsigned int istub=0; istub<(unsigned int)theStubs.size(); istub++) {
-        bool genuine = theStubs.at(istub)->isGenuine();
-        if (genuine) {
+        //bool genuine = theStubs.at(istub)->isGenuine();
+        //if (genuine) {
            nstubs ++;
            StackedTrackerDetId detIdStub( theStubs.at(istub)->getDetId() );
            bool isPS = theStackedGeometry -> isPSModule( detIdStub );
            //if (isPS) cout << " this is a stub in a PS module " << endl;
            if (isPS) nPS ++;
-	} // endif genuine
+	//} // endif genuine
        } // end loop over stubs
 
         if (imode == 1 || imode == 2 ) {
