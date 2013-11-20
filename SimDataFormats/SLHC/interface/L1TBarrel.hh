@@ -386,7 +386,6 @@ public:
 	    double rdeltaphi=Delta;
             double deltar=r-rproj;
 
-
 	    if (fabs(rdeltaphi)>0.2) continue;
 	    if (fabs(deltar)>3.0) continue;
 	    
