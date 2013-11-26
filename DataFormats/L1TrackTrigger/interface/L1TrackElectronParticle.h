@@ -45,6 +45,7 @@ namespace l1extra {
 
  	 float getTrkzVtx() const { return TrkzVtx_ ; }
 
+
          // ---------- member functions ---------------------------
 
 	 void setTrkzVtx(float TrkzVtx)  { TrkzVtx_ = TrkzVtx ; }

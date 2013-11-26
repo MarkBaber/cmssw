@@ -25,5 +25,20 @@ L1TrackEmParticle::L1TrackEmParticle( const LorentzVector& p4,
 }
 
 
+int L1TrackEmParticle::bx() const {
+ int dummy = -999;
+ if ( egRef_.isNonnull() ) {
+	return (getEGRef() -> bx()) ;
+ }
+ else {
+	return dummy;
+
+ }
+}
+
+
+
+
+
 
 

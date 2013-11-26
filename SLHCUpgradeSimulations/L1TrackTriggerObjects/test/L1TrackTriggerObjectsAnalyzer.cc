@@ -259,6 +259,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 	float et = phoIter -> pt();
 	float phi = phoIter -> phi();
 	float eta = phoIter -> eta();
+	int bx = phoIter -> bx() ;
         float trkisol = phoIter -> getTrkIsol() ;
 	const edm::Ref< L1EmParticleCollection > EGref = phoIter -> getEGRef();
 	float et_L1Calo = EGref -> et();
@@ -267,6 +268,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 
 	std::cout << " a photon candidate ET eta phi trkisol " << et << " " << eta << " " << phi << " " << trkisol << std::endl;
 	std::cout << "                Calo  ET eta phi " << et_L1Calo << " " << eta_calo << " " << phi_calo << std::endl; 
+	std::cout << "                bx = " << bx << std::endl;
     }
  }
 
@@ -286,9 +288,10 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
         float et = eleIter -> pt();
         float phi = eleIter -> phi();
         float eta = eleIter -> eta();
+	int bx = eleIter -> bx();
     	float trkisol = eleIter -> getTrkIsol() ;
 	float ztr = eleIter -> getTrkzVtx() ;
-        std::cout << "an electron candidate ET eta phi trkisol ztr " << et << " " << eta << " " << phi << " " << trkisol << " " << ztr << std::endl;
+        std::cout << "an electron candidate ET eta phi bx trkisol ztr " << et << " " << eta << " " << phi << " " << bx << " " << trkisol << " " << ztr << std::endl;
 
         const edm::Ref< L1EmParticleCollection > EGref = eleIter -> getEGRef();
         if ( EGref.isNonnull() ) {

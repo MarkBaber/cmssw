@@ -15,8 +15,8 @@
  <class name="edm::Wrapper<l1extra::L1TrackEtMissParticle>"/>
   <class name="edm::Wrapper<std::vector<l1extra::L1TrackEtMissParticle> >"/>
 
-  <class name="l1extra::L1TrackEmParticle" ClassVersion="16">
-   <version ClassVersion="16" checksum="2237095231"/>
+  <class name="l1extra::L1TrackEmParticle" ClassVersion="17">
+   <version ClassVersion="17" checksum="2856500254"/>
   </class>
   <class name="std::vector<l1extra::L1TrackEmParticle>"/>
   <class name="edm::Wrapper<std::vector<l1extra::L1TrackEmParticle> >"/>

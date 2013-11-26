@@ -38,14 +38,27 @@ namespace l1extra {
 
 	 float getTrkIsol() const { return TrkIsol_ ; } 
 
+         float getTrkIsol_v1() const { return TrkIsol_v1_ ; }
+         float getTrkIsol_v2() const { return TrkIsol_v2_ ; }
+
+
          // ---------- member functions ---------------------------
 
 	 void setTrkIsol(float TrkIsol)  { TrkIsol_ = TrkIsol ; }
+
+         void setTrkIsol_v1(float TrkIsol)  { TrkIsol_v1_ = TrkIsol ; }
+         void setTrkIsol_v2(float TrkIsol)  { TrkIsol_v2_ = TrkIsol ; }
+
+	 int bx() const;
 
       private:
 
 	 edm::Ref< L1EmParticleCollection > egRef_ ;
 	 float TrkIsol_;
+
+	// variants for the isolation :
+	float TrkIsol_v1_;
+	float TrkIsol_v2_;
     };
 }
 
