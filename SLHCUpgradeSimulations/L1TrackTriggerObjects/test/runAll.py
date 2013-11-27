@@ -10,7 +10,8 @@ from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-	'file:example_w_Tracks_and_vertex.root'
+	#'file:example_w_Tracks_and_vertex.root'
+    '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/TTbar/BE5D/TTbar_BE5D_97.root'
     )
 )
 
@@ -69,18 +70,19 @@ process.L1Reco = cms.Path( process.l1extraParticles )
 # "photons" :
 
 process.L1TrackPhotons = cms.EDProducer("L1TrackEmParticleProducer",
+        label = cms.string("NonIsolated"),
         L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
         L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
-        label = cms.string("NonIsolated"),
-	ZMAX = cms.double( 25. ),
-	CHI2MAX = cms.double( 100. ),
-	DRmin = cms.double( 0.05 ),
-	DRmax = cms.double( 0.25 ),
-	PTmin = cms.double( 2.0 ),
-	VtxConstrain  = cms.bool(False),
-	DeltaZMax = cms.double( -1 ),	  # used only when VtxConstrain = true
-	L1VertexInputTag = cms.InputTag("NotUsed")
+        L1VertexInputTag = cms.InputTag("NotUsed"),	# used only when VtxConstrain = true
+        ZMAX = cms.double( 25. ),
+        CHI2MAX = cms.double( 100. ),
+        DRmin = cms.double( 0.05),
+        DRmax = cms.double( 0.25 ),
+        VtxConstrain = cms.bool( False ),
+        DeltaZMax = cms.double( 999. ),   # used only when VtxConstrain = true
+        RelIsoCut = cms.double( -1 )
 )
+
 process.pPhotons = cms.Path( process.L1TrackPhotons )
 
 # "electrons" :
