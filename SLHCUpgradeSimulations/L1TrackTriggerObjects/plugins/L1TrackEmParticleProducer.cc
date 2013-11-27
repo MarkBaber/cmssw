@@ -66,6 +66,15 @@ class L1TrackEmParticleProducer : public edm::EDProducer {
 	edm::InputTag L1TrackInputTag;
 	std::string label;
 
+	float ZMAX;		// |z_track| < ZMAX in cm
+	float CHI2MAX;		
+	float DRmin;
+	float DRmax;
+	float PTmin;
+	bool VtxConstrain;	// use the primary vertex (default = false)
+	float DeltaZMax;	// | z_track - z_primaryvtx | < DeltaZMax in cm. 
+				// Used only when VtxConstrain = True.
+	edm::InputTag L1VertexInputTag;	// used only when VtxConstrain = True.
 } ;
 
 
@@ -78,6 +87,15 @@ L1TrackEmParticleProducer::L1TrackEmParticleProducer(const edm::ParameterSet& iC
    L1EGammaInputTag = iConfig.getParameter<edm::InputTag>("L1EGammaInputTag") ;
    L1TrackInputTag = iConfig.getParameter<edm::InputTag>("L1TrackInputTag");
    label = iConfig.getParameter<std::string>("label");
+
+   ZMAX = (float)iConfig.getParameter<double>("ZMAX");
+   CHI2MAX = (float)iConfig.getParameter<double>("CHI2MAX");
+   DRmin = (float)iConfig.getParameter<double>("DRmin");
+   DRmax = (float)iConfig.getParameter<double>("DRmax");
+   VtxConstrain = iConfig.getParameter<bool>("VtxConstrain");
+   DeltaZMax = (float)iConfig.getParameter<double>("DeltaZMax");
+
+   L1VertexInputTag = iConfig.getParameter<edm::InputTag>("L1VertexInputTag");
    
 
    produces<L1TrackEmParticleCollection>(label);

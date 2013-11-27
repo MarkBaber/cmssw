@@ -71,7 +71,15 @@ process.L1Reco = cms.Path( process.l1extraParticles )
 process.L1TrackPhotons = cms.EDProducer("L1TrackEmParticleProducer",
         L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
         L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
-        label = cms.string("NonIsolated")
+        label = cms.string("NonIsolated"),
+	ZMAX = cms.double( 25. ),
+	CHI2MAX = cms.double( 100. ),
+	DRmin = cms.double( 0.05 ),
+	DRmax = cms.double( 0.25 ),
+	PTmin = cms.double( 2.0 ),
+	VtxConstrain  = cms.bool(False),
+	DeltaZMax = cms.double( -1 ),	  # used only when VtxConstrain = true
+	L1VertexInputTag = cms.InputTag("NotUsed")
 )
 process.pPhotons = cms.Path( process.L1TrackPhotons )
 
