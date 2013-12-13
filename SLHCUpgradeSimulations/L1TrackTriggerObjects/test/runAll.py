@@ -42,7 +42,7 @@ process.L1TkEtMiss = cms.EDProducer('L1TkEtMissProducer',
      ZMAX = cms.double ( 25. ) ,        # in cm
      CHI2MAX = cms.double( 100. ),
      PTMINTRA = cms.double( 2. ),	# in GeV
-     DeltaZ = cms.double( 0.1 ),       # in cm
+     DeltaZ = cms.double( 0.2 ),       # in cm
      nStubsmin = cms.int32( 4 )
 )
 
