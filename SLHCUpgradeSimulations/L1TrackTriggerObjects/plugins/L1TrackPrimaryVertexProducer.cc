@@ -84,9 +84,12 @@ class L1TrackPrimaryVertexProducer : public edm::EDProducer {
 
       // ----------member data ---------------------------
 
+        edm::InputTag L1TrackInputTag;
+
 	float ZMAX;	// in cm
 	float DeltaZ;	// in cm
 	float CHI2MAX;
+	float PTMINTRA ; 	// in GeV
 
         const StackedTrackerGeometry*                   theStackedGeometry;
 
@@ -118,9 +121,12 @@ L1TrackPrimaryVertexProducer::L1TrackPrimaryVertexProducer(const edm::ParameterS
 */
    //now do what ever other initialization is needed
   
+  L1TrackInputTag = iConfig.getParameter<edm::InputTag>("L1TrackInputTag");
+
   ZMAX = (float)iConfig.getParameter<double>("ZMAX");
   DeltaZ = (float)iConfig.getParameter<double>("DeltaZ");
   CHI2MAX = (float)iConfig.getParameter<double>("CHI2MAX");
+  PTMINTRA = (float)iConfig.getParameter<double>("PTMINTRA");
 
 
   produces<L1TrackPrimaryVertexCollection>();
@@ -167,13 +173,15 @@ L1TrackPrimaryVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup&
 
 
   edm::Handle<L1TkTrackCollectionType> L1TkTrackHandle;
-  iEvent.getByLabel("L1Tracks","Level1TkTracks",L1TkTrackHandle);
+  //iEvent.getByLabel("L1Tracks","Level1TkTracks",L1TkTrackHandle);
+ iEvent.getByLabel(L1TrackInputTag, L1TkTrackHandle);   
+
 
 	// max(Sum PT2), tracks with at least 3 stubs in PS layers
    float sum1 = -999;
    int nStubsmin = 4;
    int nPSmin = 3;
-   float ptmin = 2. ;
+   float ptmin = PTMINTRA ;
    int imode = 2;
    float z1 = MaxPtVertex( L1TkTrackHandle, sum1, nStubsmin, nPSmin, ptmin, imode );
    L1TrackPrimaryVertex vtx1( z1, sum1 );

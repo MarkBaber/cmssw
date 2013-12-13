@@ -6,14 +6,14 @@
 #include <boost/cstdint.hpp> 
 
 #include "DataFormats/L1TrackTrigger/interface/L1TrackPrimaryVertex.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticleFwd.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticleFwd.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticleFwd.h"
 
 #include "DataFormats/Common/interface/Wrapper.h"
 #include "DataFormats/Common/interface/RefVector.h"
@@ -29,30 +29,30 @@ namespace {
      edm::Ref< L1TrackPrimaryVertexCollection > trkvtxRef ;
 
 
-	// L1TrackEtMiss... following L1EtMiss...
-     l1extra::L1TrackEtMissParticle TketMiss ;
-     l1extra::L1TrackEtMissParticleCollection TketMissColl ;
-     edm::Wrapper<l1extra::L1TrackEtMissParticle> w_TketMiss;
-     edm::Wrapper<l1extra::L1TrackEtMissParticleCollection> w_TketMissColl;
-     //l1extra::L1TrackEtMissParticleRef refTkEtMiss ;
-     //l1extra::L1TrackEtMissParticleRefVector refTkVecEtMiss ;
-     //l1extra::L1TrackEtMissParticleVectorRef vecTkRefEtMissColl ;
-     //l1extra::L1TrackEtMissParticleRefProd refTkProdEtMiss ;
-     //edm::reftobase::Holder<reco::Candidate, l1extra::L1TrackEtMissParticleRef> rtbTkm1;
-     //edm::reftobase::Holder<reco::Candidate, l1extra::L1TrackEtMissParticleRefProd> rtbTkm2;
+	// L1TkEtMiss... following L1EtMiss...
+     l1extra::L1TkEtMissParticle TketMiss ;
+     l1extra::L1TkEtMissParticleCollection TketMissColl ;
+     edm::Wrapper<l1extra::L1TkEtMissParticle> w_TketMiss;
+     edm::Wrapper<l1extra::L1TkEtMissParticleCollection> w_TketMissColl;
+     //l1extra::L1TkEtMissParticleRef refTkEtMiss ;
+     //l1extra::L1TkEtMissParticleRefVector refTkVecEtMiss ;
+     //l1extra::L1TkEtMissParticleVectorRef vecTkRefEtMissColl ;
+     //l1extra::L1TkEtMissParticleRefProd refTkProdEtMiss ;
+     //edm::reftobase::Holder<reco::Candidate, l1extra::L1TkEtMissParticleRef> rtbTkm1;
+     //edm::reftobase::Holder<reco::Candidate, l1extra::L1TkEtMissParticleRefProd> rtbTkm2;
 
-	// L1TrackEmParticle
-     l1extra::L1TrackEmParticleCollection trkemColl ;
-     edm::Wrapper<l1extra::L1TrackEmParticleCollection> w_trkemColl;
-     l1extra::L1TrackEmParticleRef reftrkEm ;
-     //l1extra::L1TrackEmParticleRefVector refVectrkEmColl ;
-     //l1extra::L1TrackEmParticleVectorRef vecReftrkEmColl ;
-     //edm::reftobase::Holder<reco::Candidate, l1extra::L1TrackEmParticleRef> rtbtrke;
+	// L1TkEmParticle
+     l1extra::L1TkEmParticleCollection trkemColl ;
+     edm::Wrapper<l1extra::L1TkEmParticleCollection> w_trkemColl;
+     l1extra::L1TkEmParticleRef reftrkEm ;
+     //l1extra::L1TkEmParticleRefVector refVectrkEmColl ;
+     //l1extra::L1TkEmParticleVectorRef vecReftrkEmColl ;
+     //edm::reftobase::Holder<reco::Candidate, l1extra::L1TkEmParticleRef> rtbtrke;
 
-        // L1TrackElectronParticle
-     l1extra::L1TrackElectronParticleCollection trkeleColl ;
-     edm::Wrapper<l1extra::L1TrackElectronParticleCollection> w_trkeleColl;
-     l1extra::L1TrackElectronParticleRef reftrkEle ;
+        // L1TkElectronParticle
+     l1extra::L1TkElectronParticleCollection trkeleColl ;
+     edm::Wrapper<l1extra::L1TkElectronParticleCollection> w_trkeleColl;
+     l1extra::L1TkElectronParticleRef reftrkEle ;
 
 
 

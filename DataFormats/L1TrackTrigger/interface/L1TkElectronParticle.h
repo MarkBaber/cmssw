@@ -1,10 +1,10 @@
-#ifndef L1TrackTrigger_L1ElectronParticle_h
-#define L1TrackTrigger_L1ElectronParticle_h
+#ifndef L1TkTrigger_L1ElectronParticle_h
+#define L1TkTrigger_L1ElectronParticle_h
 
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TrackEmParticle
+// Class  :     L1TkEmParticle
 // 
 
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
@@ -13,7 +13,7 @@
 
 #include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticle.h"
 
 //#include "SimDataFormats/SLHC/interface/L1TkTrack.h"
 #include "SimDataFormats/SLHC/interface/StackedTrackerTypes.h"
@@ -21,7 +21,7 @@
 
 namespace l1extra {
          
-   class L1TrackElectronParticle : public L1TrackEmParticle
+   class L1TkElectronParticle : public L1TkEmParticle
    {     
          
       public:
@@ -29,14 +29,14 @@ namespace l1extra {
   typedef L1TkTrack_PixelDigi_                          L1TkTrackType;
   typedef std::vector< L1TkTrackType >                  L1TkTrackCollectionType;
            
-         L1TrackElectronParticle();
+         L1TkElectronParticle();
 
-	 L1TrackElectronParticle( const LorentzVector& p4,
+	 L1TkElectronParticle( const LorentzVector& p4,
 			    const edm::Ref< L1EmParticleCollection >& egRef,
 			    const edm::Ptr< L1TkTrackType >& trkPtr,
 			    float tkisol = -999. );
 
-	virtual ~L1TrackElectronParticle() {}
+	virtual ~L1TkElectronParticle() {}
 
          // ---------- const member functions ---------------------
 

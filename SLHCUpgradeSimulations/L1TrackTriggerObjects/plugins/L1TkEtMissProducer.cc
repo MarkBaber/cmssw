@@ -45,8 +45,8 @@
 #include "DataFormats/SiPixelDetId/interface/StackedTrackerDetId.h"
 
 
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticleFwd.h"
 
 
 using namespace l1extra;
@@ -55,14 +55,14 @@ using namespace l1extra;
 // class declaration
 //
 
-class L1TrackEtMissProducer : public edm::EDProducer {
+class L1TkEtMissProducer : public edm::EDProducer {
    public:
 
   typedef L1TkTrack_PixelDigi_                          L1TkTrackType;
   typedef std::vector< L1TkTrackType >                               L1TkTrackCollectionType;
 
-      explicit L1TrackEtMissProducer(const edm::ParameterSet&);
-      ~L1TrackEtMissProducer();
+      explicit L1TkEtMissProducer(const edm::ParameterSet&);
+      ~L1TkEtMissProducer();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -79,12 +79,13 @@ class L1TrackEtMissProducer : public edm::EDProducer {
 
       // ----------member data ---------------------------
 
-        edm::InputTag L1VtxLabel;
+        edm::InputTag L1VertexInputTag;
+        edm::InputTag L1TrackInputTag;
 
 	float ZMAX;	// in cm
 	float DeltaZ;	// in cm
 	float CHI2MAX;
-	float Ptmin;	// in GeV
+	float PTMINTRA;	// in GeV
         int nStubsmin;
 
 
@@ -104,7 +105,7 @@ class L1TrackEtMissProducer : public edm::EDProducer {
 //
 // constructors and destructor
 //
-L1TrackEtMissProducer::L1TrackEtMissProducer(const edm::ParameterSet& iConfig)
+L1TkEtMissProducer::L1TkEtMissProducer(const edm::ParameterSet& iConfig)
 {
    //register your products
 /* Examples
@@ -118,20 +119,22 @@ L1TrackEtMissProducer::L1TrackEtMissProducer(const edm::ParameterSet& iConfig)
 */
    //now do what ever other initialization is needed
   
-  L1VtxLabel = iConfig.getParameter<edm::InputTag>("L1VtxLabel") ;
+  L1VertexInputTag = iConfig.getParameter<edm::InputTag>("L1VertexInputTag") ;
+  L1TrackInputTag = iConfig.getParameter<edm::InputTag>("L1TrackInputTag");
+
 
   ZMAX = (float)iConfig.getParameter<double>("ZMAX");
   DeltaZ = (float)iConfig.getParameter<double>("DeltaZ");
   CHI2MAX = (float)iConfig.getParameter<double>("CHI2MAX");
-  Ptmin = (float)iConfig.getParameter<double>("Ptmin");
+  PTMINTRA = (float)iConfig.getParameter<double>("PTMINTRA");
   nStubsmin = iConfig.getParameter<int>("nStubsmin");
 
-  produces<L1TrackEtMissParticleCollection>("MET");
+  produces<L1TkEtMissParticleCollection>("MET");
 
 }
 
 
-L1TrackEtMissProducer::~L1TrackEtMissProducer()
+L1TkEtMissProducer::~L1TkEtMissProducer()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -146,7 +149,7 @@ L1TrackEtMissProducer::~L1TrackEtMissProducer()
 
 // ------------ method called to produce the data  ------------
 void
-L1TrackEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+L1TkEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
 /* This is an event example
@@ -166,14 +169,15 @@ L1TrackEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
    iSetup.get<SetupRecord>().get(pSetup);
 */
  
- std::auto_ptr<L1TrackEtMissParticleCollection> result(new L1TrackEtMissParticleCollection);
+ std::auto_ptr<L1TkEtMissParticleCollection> result(new L1TkEtMissParticleCollection);
 
  edm::Handle<L1TrackPrimaryVertexCollection> L1VertexHandle;
- iEvent.getByLabel(L1VtxLabel,L1VertexHandle);
+ iEvent.getByLabel(L1VertexInputTag,L1VertexHandle);
  std::vector<L1TrackPrimaryVertex>::const_iterator vtxIter;
 
  edm::Handle<L1TkTrackCollectionType> L1TkTrackHandle;
- iEvent.getByLabel("L1Tracks","Level1TkTracks",L1TkTrackHandle);
+ //iEvent.getByLabel("L1Tracks","Level1TkTracks",L1TkTrackHandle);
+ iEvent.getByLabel(L1TrackInputTag, L1TkTrackHandle);
  L1TkTrackCollectionType::const_iterator trackIter;
 
  int ivtx = 0;
@@ -198,7 +202,7 @@ L1TrackEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     	    float chi2 = trackIter->getChi2();
     	    float ztr  = trackIter->getVertex().z();
 	
-    	    if (pt < Ptmin) continue;
+    	    if (pt < PTMINTRA) continue;
     	    if (fabs(ztr) > ZMAX ) continue;
     	    if (chi2 > CHI2MAX) continue;
                 
@@ -235,8 +239,8 @@ L1TrackEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
      double etmiss_PU = sqrt( sumPx_PU*sumPx_PU + sumPy_PU*sumPy_PU );
 
      int ibx = 0;
-     result -> push_back(  L1TrackEtMissParticle( missingEt,
-				 L1TrackEtMissParticle::kMET,
+     result -> push_back(  L1TkEtMissParticle( missingEt,
+				 L1TkEtMissParticle::kMET,
 				 etTot,
 				 etmiss_PU,
 				 etTot_PU,
@@ -253,18 +257,18 @@ L1TrackEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-L1TrackEtMissProducer::beginJob()
+L1TkEtMissProducer::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-L1TrackEtMissProducer::endJob() {
+L1TkEtMissProducer::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
 void
-L1TrackEtMissProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
+L1TkEtMissProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
 {
 
 /*
@@ -289,7 +293,7 @@ L1TrackEtMissProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
 // ------------ method called when ending the processing of a run  ------------
 /*
 void
-L1TrackEtMissProducer::endRun(edm::Run&, edm::EventSetup const&)
+L1TkEtMissProducer::endRun(edm::Run&, edm::EventSetup const&)
 {
 }
 */
@@ -297,7 +301,7 @@ L1TrackEtMissProducer::endRun(edm::Run&, edm::EventSetup const&)
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
 void
-L1TrackEtMissProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+L1TkEtMissProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 */
@@ -305,14 +309,14 @@ L1TrackEtMissProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSet
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
 void
-L1TrackEtMissProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+L1TkEtMissProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 */
  
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-L1TrackEtMissProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+L1TkEtMissProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -321,4 +325,4 @@ L1TrackEtMissProducer::fillDescriptions(edm::ConfigurationDescriptions& descript
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(L1TrackEtMissProducer);
+DEFINE_FWK_MODULE(L1TkEtMissProducer);

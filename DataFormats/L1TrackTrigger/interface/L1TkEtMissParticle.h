@@ -1,11 +1,11 @@
-#ifndef L1TrackTrigger_L1TrackEtMissParticle_h
-#define L1TrackTrigger_L1TrackEtMissParticle_h
+#ifndef L1TkTrigger_L1TkEtMissParticle_h
+#define L1TkTrigger_L1TkEtMissParticle_h
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TrackEtMissParticle
+// Class  :     L1TkEtMissParticle
 // 
-/**\class L1TrackEtMissParticle 
+/**\class L1TkEtMissParticle 
 
  Description: L1Extra particle class for EtMiss object.
 */
@@ -26,15 +26,15 @@
 
 namespace l1extra {
 
-  class L1TrackEtMissParticle : public reco::LeafCandidate
+  class L1TkEtMissParticle : public reco::LeafCandidate
     { 
     public:
       
       enum EtMissType{ kMET, kMHT, kNumTypes } ;
 
-      L1TrackEtMissParticle();
+      L1TkEtMissParticle();
 
-      L1TrackEtMissParticle(
+      L1TkEtMissParticle(
         const LorentzVector& p4,
         EtMissType type,
         const double& etTotal,

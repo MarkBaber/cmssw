@@ -51,9 +51,11 @@ process.pL1Tracks = cms.Path( process.BeamSpotFromSim*process.L1Tracks )
 # the configuration parameters below are not yet optimized !
 
 process.L1TrackPrimaryVertex = cms.EDProducer('L1TrackPrimaryVertexProducer',
+     L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
      ZMAX = cms.double ( 25. ) ,	# in cm
      CHI2MAX = cms.double( 100. ),
-     DeltaZ = cms.double( 0.05 )    	# in cm.  1 mm may be better 
+     DeltaZ = cms.double( 0.1 ),    	# in cm.   
+     PTMINTRA = cms.double( 2.) 	# PTMIN of L1Tracks, in GeV
 )
 
 process.p = cms.Path( process.L1TrackPrimaryVertex )

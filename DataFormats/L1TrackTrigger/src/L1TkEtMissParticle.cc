@@ -1,12 +1,12 @@
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticle.h"
 
 using namespace l1extra ;
 
-L1TrackEtMissParticle::L1TrackEtMissParticle()
+L1TkEtMissParticle::L1TkEtMissParticle()
 {
 }
 
-L1TrackEtMissParticle::L1TrackEtMissParticle(
+L1TkEtMissParticle::L1TkEtMissParticle(
         const LorentzVector& p4,
         EtMissType type,
         const double& etTotal,

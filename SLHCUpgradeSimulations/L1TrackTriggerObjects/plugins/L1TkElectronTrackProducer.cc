@@ -1,7 +1,10 @@
 // -*- C++ -*-
 //
 //
-// dummy producer for a L1TrackEmParticle
+// Producer of a L1TkElectronParticle, for the algorithm matching a L1Track to the L1EG object.
+// This code is just an example, I simply pick up the L1Track that is closest to the
+// L1EG algorithm.
+// The proper producer will be provided by Suchandra & Atanu. 
 // 
 
 // system include files
@@ -21,8 +24,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticleFwd.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
@@ -40,14 +43,14 @@ using namespace l1extra ;
 // class declaration
 //
 
-class L1TrackElectronParticleProducer : public edm::EDProducer {
+class L1TkElectronTrackProducer : public edm::EDProducer {
    public:
 
   typedef L1TkTrack_PixelDigi_                          L1TkTrackType;
   typedef std::vector< L1TkTrackType >                               L1TkTrackCollectionType;
 
-      explicit L1TrackElectronParticleProducer(const edm::ParameterSet&);
-      ~L1TrackElectronParticleProducer();
+      explicit L1TkElectronTrackProducer(const edm::ParameterSet&);
+      ~L1TkElectronTrackProducer();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -72,7 +75,7 @@ class L1TrackElectronParticleProducer : public edm::EDProducer {
 //
 // constructors and destructor
 //
-L1TrackElectronParticleProducer::L1TrackElectronParticleProducer(const edm::ParameterSet& iConfig)
+L1TkElectronTrackProducer::L1TkElectronTrackProducer(const edm::ParameterSet& iConfig)
 {
 
    L1EGammaInputTag = iConfig.getParameter<edm::InputTag>("L1EGammaInputTag") ;
@@ -80,19 +83,19 @@ L1TrackElectronParticleProducer::L1TrackElectronParticleProducer(const edm::Para
    label = iConfig.getParameter<std::string>("label");
    
 
-   produces<L1TrackElectronParticleCollection>(label);
+   produces<L1TkElectronParticleCollection>(label);
 }
 
-L1TrackElectronParticleProducer::~L1TrackElectronParticleProducer() {
+L1TkElectronTrackProducer::~L1TkElectronTrackProducer() {
 }
 
 // ------------ method called to produce the data  ------------
 void
-L1TrackElectronParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
 
- std::auto_ptr<L1TrackElectronParticleCollection> result(new L1TrackElectronParticleCollection);
+ std::auto_ptr<L1TkElectronParticleCollection> result(new L1TkElectronParticleCollection);
 
  edm::Handle<L1EmParticleCollection> EGammaHandle;
  iEvent.getByLabel(L1EGammaInputTag,EGammaHandle);
@@ -148,31 +151,10 @@ L1TrackElectronParticleProducer::produce(edm::Event& iEvent, const edm::EventSet
 
 	    float trkisol = -999; 	// dummy
 
- 	    L1TrackElectronParticle trkEm( TrackP4, 
+ 	    L1TkElectronParticle trkEm( TrackP4, 
 				 EGammaRef,
 				 L1TrackPtr, 
 			         trkisol );
-
-	/*
-	Note : to create an L1TrackElectronParticle without a reference to a L1Track 
-	(e.g. when matching the L1EGamma with stubs and not tracks :
-
-	   The 4-momentum of the electron is then probably that of the L1EGamma
-	   object - see L1TrackEmProducer.cc to retrieve P4
-	   One could then do :
-
-	   edm::Ptr< L1TkTrackType > L1TrackPtrNull;     //  null pointer
-	   L1TrackElectronParticle trkEm( P4,
-                                 EGammaRef,
-                                 L1TrackPtrNull, 
-                                 trkisol,
-                                 ibx );
-
-	   and one can set the "z" of the electron, as determined by the 
-	   algorithm, via :
-	   
-	   trkEm.setTrkzVtx( z );
-	*/
 
 	    result -> push_back( trkEm );
 
@@ -187,19 +169,19 @@ L1TrackElectronParticleProducer::produce(edm::Event& iEvent, const edm::EventSet
 
 // ------------ method called once each job just before starting event loop  ------------
 void
-L1TrackElectronParticleProducer::beginJob()
+L1TkElectronTrackProducer::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void
-L1TrackElectronParticleProducer::endJob() {
+L1TkElectronTrackProducer::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
 /*
 void
-L1TrackElectronParticleProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
+L1TkElectronTrackProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
 {
 }
 */
@@ -207,7 +189,7 @@ L1TrackElectronParticleProducer::beginRun(edm::Run& iRun, edm::EventSetup const&
 // ------------ method called when ending the processing of a run  ------------
 /*
 void
-L1TrackElectronParticleProducer::endRun(edm::Run&, edm::EventSetup const&)
+L1TkElectronTrackProducer::endRun(edm::Run&, edm::EventSetup const&)
 {
 }
 */
@@ -215,7 +197,7 @@ L1TrackElectronParticleProducer::endRun(edm::Run&, edm::EventSetup const&)
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
 void
-L1TrackElectronParticleProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+L1TkElectronTrackProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 */
@@ -223,14 +205,14 @@ L1TrackElectronParticleProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
 void
-L1TrackElectronParticleProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+L1TkElectronTrackProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-L1TrackElectronParticleProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+L1TkElectronTrackProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -239,7 +221,7 @@ L1TrackElectronParticleProducer::fillDescriptions(edm::ConfigurationDescriptions
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(L1TrackElectronParticleProducer);
+DEFINE_FWK_MODULE(L1TkElectronTrackProducer);
 
 
 

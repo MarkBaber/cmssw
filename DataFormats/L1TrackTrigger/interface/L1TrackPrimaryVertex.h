@@ -1,5 +1,5 @@
-#ifndef L1TrackTrigger_L1TrackPrimaryVertex_h
-#define L1TrackTrigger_L1TrackPrimaryVertex_h
+#ifndef L1TkTrigger_L1TrackPrimaryVertex_h
+#define L1TkTrigger_L1TrackPrimaryVertex_h
 
 
 // Nov 12, 2013

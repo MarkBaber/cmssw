@@ -10,8 +10,8 @@ from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-	'file:example_w_Tracks_and_vertex.root'
-    #'/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/TTbar/BE5D/TTbar_BE5D_97.root'
+       '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/MinBias/BE5D/zmatchingOff/m1_MinBias_BE5D.root',
+       '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/MinBias/BE5D/zmatchingOff/m2_MinBias_BE5D.root'
     )
 )
 
@@ -38,11 +38,11 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS261_V3::All', '')
 
 process.L1TkEtMiss = cms.EDProducer('L1TkEtMissProducer',
      L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
-     L1VertexInputTag = cms.InputTag("L1TrackPrimaryVertex"),
+     L1VertexInputTag = cms.InputTag("L1TrackPrimaryVertex2"),
      ZMAX = cms.double ( 25. ) ,        # in cm
      CHI2MAX = cms.double( 100. ),
      PTMINTRA = cms.double( 2. ),	# in GeV
-     DeltaZ = cms.double( 0.1 ),       # in cm
+     DeltaZ = cms.double( 0.2 ),       # in cm
      nStubsmin = cms.int32( 4 )
 )
 
@@ -107,62 +107,6 @@ process.L1TkPhotons = cms.EDProducer("L1TkEmParticleProducer",
 process.pPhotons = cms.Path( process.L1TkPhotons )
 
 
-# --- Now run the L1TkElectronProducers : one for the algoritm that
-# --- matches with L1Tracks, the other for the algorithm that matches
-# --- with stubs.
-
-
-# "electrons" from L1Tracks :
-
-process.L1TkElectronsTrack = cms.EDProducer("L1TkElectronTrackProducer",
-        L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
-        L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
-        label = cms.string("NonIsolated")
-)
-process.pElectronsTrack = cms.Path( process.L1TkElectronsTrack )
-
-
-# "electrons" from stubs :
-
-process.L1TkElectronsStubs = cms.EDProducer("L1TkElectronStubsProducer",
-        L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
-        L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
-        label = cms.string("NonIsolated")
-)
-process.pElectronsStubs = cms.Path( process.L1TkElectronsStubs )
-
-
-
-#
-# ---------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------
-#
-# --- Run the analyzer
-
-process.ana = cms.EDAnalyzer( 'L1TrackTriggerObjectsAnalyzer' ,
-    L1VtxInputTag = cms.InputTag("L1TkPrimaryVertex"),
-    L1TkEtMissInputTag = cms.InputTag("L1TkEtMiss","MET"),
-    L1TkElectronsInputTag = cms.InputTag("L1TkElectronsTrack","NonIsolated"),
-    L1TkPhotonsInputTag = cms.InputTag("L1TkPhotons","EGIsoTrk")
-)
-
-
-# root file with histograms produced by the analyzer
-# (mostly empty currently)
-
-filename = "ana.root"
-process.TFileService = cms.Service("TFileService", fileName = cms.string(filename), closeFileFast = cms.untracked.bool(True)
-)
-
-process.pAna = cms.Path( process.ana )
-
-#
-# ---------------------------------------------------------------------------
-
-
-
-
 
 
 process.Out = cms.OutputModule( "PoolOutputModule",
@@ -171,13 +115,11 @@ process.Out = cms.OutputModule( "PoolOutputModule",
     outputCommands = cms.untracked.vstring( 'drop *')
 )
 
-process.Out.outputCommands.append( 'keep *_*_*_ALL' )
-process.Out.outputCommands.append( 'keep *_*_*_VTX' )
-process.Out.outputCommands.append('keep *_generator_*_*')
-process.Out.outputCommands.append('keep *_*gen*_*_*')
-process.Out.outputCommands.append('keep *_*Gen*_*_*')
-process.Out.outputCommands.append('keep *_rawDataCollector_*_*')
-process.Out.outputCommands.append('keep *_L1TkStubsFromPixelDigis_StubsPass_*')
+
+process.Out.outputCommands.append('keep *_L1TkPhotons_*_*')
+process.Out.outputCommands.append('keep *_L1TkEtMiss_*_*')
+process.Out.outputCommands.append('keep *_l1extraParticles_*_*')
+
 
 process.FEVToutput_step = cms.EndPath(process.Out)
 

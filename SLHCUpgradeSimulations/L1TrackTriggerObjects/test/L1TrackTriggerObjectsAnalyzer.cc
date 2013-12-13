@@ -42,12 +42,12 @@
 #include "DataFormats/Candidate/interface/Candidate.h"
 
 #include "DataFormats/L1TrackTrigger/interface/L1TrackPrimaryVertex.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEtMissParticleFwd.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticleFwd.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticleFwd.h"
 
 
 
@@ -95,11 +95,11 @@ class L1TrackTriggerObjectsAnalyzer : public edm::EDAnalyzer {
 	TH1F* h_dz2;
 
 	// for L1TrackEtmiss:
-	edm::InputTag L1EtMissInputTag;
+	edm::InputTag L1TkEtMissInputTag;
 
-	// for L1TrackEmParticles
-        edm::InputTag L1TrackPhotonsInputTag;
-	edm::InputTag L1TrackElectronsInputTag;
+	// for L1TkEmParticles
+        edm::InputTag L1TkPhotonsInputTag;
+	edm::InputTag L1TkElectronsInputTag;
 };
 
 //
@@ -130,9 +130,9 @@ L1TrackTriggerObjectsAnalyzer::L1TrackTriggerObjectsAnalyzer(const edm::Paramete
    h_dz2 = fs -> make<TH1F>("h_dz2",";z_{L1} - z_{gen} (cm); Evts",nbins, x1, x2);
 
   L1VtxInputTag = iConfig.getParameter<edm::InputTag>("L1VtxInputTag") ;
-  L1EtMissInputTag = iConfig.getParameter<edm::InputTag>("L1EtMissInputTag");
-  L1TrackElectronsInputTag = iConfig.getParameter<edm::InputTag>("L1TrackElectronsInputTag");
-  L1TrackPhotonsInputTag = iConfig.getParameter<edm::InputTag>("L1TrackPhotonsInputTag");
+  L1TkEtMissInputTag = iConfig.getParameter<edm::InputTag>("L1TkEtMissInputTag");
+  L1TkElectronsInputTag = iConfig.getParameter<edm::InputTag>("L1TkElectronsInputTag");
+  L1TkPhotonsInputTag = iConfig.getParameter<edm::InputTag>("L1TkPhotonsInputTag");
 }
 
 
@@ -229,13 +229,13 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 	// retrieve the EtMiss objects
 	//
 
- edm::Handle<L1TrackEtMissParticleCollection> L1TrackEtMissHandle;
- iEvent.getByLabel(L1EtMissInputTag, L1TrackEtMissHandle);
- std::vector<L1TrackEtMissParticle>::const_iterator etmIter;
+ edm::Handle<L1TkEtMissParticleCollection> L1TkEtMissHandle;
+ iEvent.getByLabel(L1TkEtMissInputTag, L1TkEtMissHandle);
+ std::vector<L1TkEtMissParticle>::const_iterator etmIter;
 
- if (L1TrackEtMissHandle.isValid() ) {
-    std::cout << " -----  L1TrackEtMiss objects  -----  " << std::endl; 
-    for (etmIter = L1TrackEtMissHandle -> begin(); etmIter != L1TrackEtMissHandle->end(); ++etmIter) {
+ if (L1TkEtMissHandle.isValid() ) {
+    std::cout << " -----  L1TkEtMiss objects  -----  " << std::endl; 
+    for (etmIter = L1TkEtMissHandle -> begin(); etmIter != L1TkEtMissHandle->end(); ++etmIter) {
 	float etmis = etmIter -> et();
 	const edm::Ref< L1TrackPrimaryVertexCollection > vtxRef = etmIter -> getVtxRef();
 	float zvtx = vtxRef -> getZvertex();
@@ -246,16 +246,16 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 
         //
         // ----------------------------------------------------------------------
-        // retrieve the L1TrackEmParticle objects
+        // retrieve the L1TkEmParticle objects
 	//
 
- edm::Handle<L1TrackEmParticleCollection> L1TrackPhotonsHandle;
- iEvent.getByLabel(L1TrackPhotonsInputTag, L1TrackPhotonsHandle);
- std::vector<L1TrackEmParticle>::const_iterator phoIter ;
+ edm::Handle<L1TkEmParticleCollection> L1TkPhotonsHandle;
+ iEvent.getByLabel(L1TkPhotonsInputTag, L1TkPhotonsHandle);
+ std::vector<L1TkEmParticle>::const_iterator phoIter ;
 
- if ( L1TrackPhotonsHandle.isValid() ) {
-    std::cout << " -----   L1TrackEmParticle  objects -----  " << std::endl;
-    for (phoIter = L1TrackPhotonsHandle -> begin(); phoIter != L1TrackPhotonsHandle->end(); ++phoIter) {
+ if ( L1TkPhotonsHandle.isValid() ) {
+    std::cout << " -----   L1TkEmParticle  objects -----  " << std::endl;
+    for (phoIter = L1TkPhotonsHandle -> begin(); phoIter != L1TkPhotonsHandle->end(); ++phoIter) {
 	float et = phoIter -> pt();
 	float phi = phoIter -> phi();
 	float eta = phoIter -> eta();
@@ -275,16 +275,16 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 
         //
         // ----------------------------------------------------------------------
-        // retrieve the L1TrackElectronParticle objects
+        // retrieve the L1TkElectronParticle objects
         //
 
- edm::Handle<L1TrackElectronParticleCollection> L1TrackElectronsHandle;
- iEvent.getByLabel(L1TrackElectronsInputTag, L1TrackElectronsHandle);
- std::vector<L1TrackElectronParticle>::const_iterator eleIter ;
+ edm::Handle<L1TkElectronParticleCollection> L1TkElectronsHandle;
+ iEvent.getByLabel(L1TkElectronsInputTag, L1TkElectronsHandle);
+ std::vector<L1TkElectronParticle>::const_iterator eleIter ;
 
- if ( L1TrackElectronsHandle.isValid() ) {
-    std::cout << " -----   L1TrackElectronParticle  objects -----  " << std::endl;
-    for (eleIter = L1TrackElectronsHandle -> begin(); eleIter != L1TrackElectronsHandle->end(); ++eleIter) {
+ if ( L1TkElectronsHandle.isValid() ) {
+    std::cout << " -----   L1TkElectronParticle  objects -----  " << std::endl;
+    for (eleIter = L1TkElectronsHandle -> begin(); eleIter != L1TkElectronsHandle->end(); ++eleIter) {
         float et = eleIter -> pt();
         float phi = eleIter -> phi();
         float eta = eleIter -> eta();

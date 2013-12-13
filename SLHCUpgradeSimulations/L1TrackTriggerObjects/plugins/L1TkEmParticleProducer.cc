@@ -1,7 +1,7 @@
 // -*- C++ -*-
 //
 //
-// dummy producer for a L1TrackEmParticle
+// dummy producer for a L1TkEmParticle
 // 
 
 // system include files
@@ -21,8 +21,8 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticleFwd.h"
 
 #include "DataFormats/L1TrackTrigger/interface/L1TrackPrimaryVertex.h"
 
@@ -42,14 +42,14 @@ using namespace l1extra ;
 // class declaration
 //
 
-class L1TrackEmParticleProducer : public edm::EDProducer {
+class L1TkEmParticleProducer : public edm::EDProducer {
    public:
 
   typedef L1TkTrack_PixelDigi_                          L1TkTrackType;
   typedef std::vector< L1TkTrackType >                               L1TkTrackCollectionType;
 
-      explicit L1TrackEmParticleProducer(const edm::ParameterSet&);
-      ~L1TrackEmParticleProducer();
+      explicit L1TkEmParticleProducer(const edm::ParameterSet&);
+      ~L1TkEmParticleProducer();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -71,61 +71,68 @@ class L1TrackEmParticleProducer : public edm::EDProducer {
       // ----------member data ---------------------------
 	edm::InputTag L1EGammaInputTag;
 	edm::InputTag L1TrackInputTag;
-        edm::InputTag L1VertexInputTag; // used only when VtxConstrain = True.
+        edm::InputTag L1VertexInputTag; // used only when PrimaryVtxConstrain = True.
 
 	std::string label;
+
+	float ETmin; 	// min ET in GeV of L1EG objects
 
 	float ZMAX;		// |z_track| < ZMAX in cm
 	float CHI2MAX;		
 	float DRmin;
 	float DRmax;
-	float PTmin;
-	bool VtxConstrain;	// use the primary vertex (default = false)
+	float PTMINTRA;
+	bool PrimaryVtxConstrain;	// use the primary vertex (default = false)
 	float DeltaZMax;	// | z_track - z_primaryvtx | < DeltaZMax in cm. 
-				// Used only when VtxConstrain = True.
-	float RelIsoCut;
+				// Used only when PrimaryVtxConstrain = True.
+	float IsoCut;
+	bool RelativeIsolation;
 } ;
 
 
 //
 // constructors and destructor
 //
-L1TrackEmParticleProducer::L1TrackEmParticleProducer(const edm::ParameterSet& iConfig)
+L1TkEmParticleProducer::L1TkEmParticleProducer(const edm::ParameterSet& iConfig)
 {
 
    label = iConfig.getParameter<std::string>("label");  // label of the collection produced
 							// e.g. EG or IsoEG if all objects are kept
 							// EGIsoTrk or IsoEGIsoTrk if only the EG or IsoEG
-							// objects that pass a cut RelIso < RelIsoCut are written
+							// objects that pass a cut RelIso < IsoCut are written
 							// in the new collection.
 
    L1EGammaInputTag = iConfig.getParameter<edm::InputTag>("L1EGammaInputTag") ;
    L1TrackInputTag = iConfig.getParameter<edm::InputTag>("L1TrackInputTag");
-   L1VertexInputTag = iConfig.getParameter<edm::InputTag>("L1VertexInputTag");	// only used when VtxConstrain = true
+   L1VertexInputTag = iConfig.getParameter<edm::InputTag>("L1VertexInputTag");	// only used when PrimaryVtxConstrain = true
+
+   ETmin = (float)iConfig.getParameter<double>("ETmin");
 
 	// parameters for the calculation of the isolation :
    ZMAX = (float)iConfig.getParameter<double>("ZMAX");
    CHI2MAX = (float)iConfig.getParameter<double>("CHI2MAX");
+   PTMINTRA = (float)iConfig.getParameter<double>("PTMINTRA");
    DRmin = (float)iConfig.getParameter<double>("DRmin");
    DRmax = (float)iConfig.getParameter<double>("DRmax");
-   VtxConstrain = iConfig.getParameter<bool>("VtxConstrain");
+   PrimaryVtxConstrain = iConfig.getParameter<bool>("PrimaryVtxConstrain");
    DeltaZMax = (float)iConfig.getParameter<double>("DeltaZMax");
-	// cut applied on the relative isolation (if this number is <= 0, no cut is applied)
-   RelIsoCut = (float)iConfig.getParameter<double>("RelIsoCut");
+	// cut applied on the isolation (if this number is <= 0, no cut is applied)
+   IsoCut = (float)iConfig.getParameter<double>("IsoCut");
+   RelativeIsolation = iConfig.getParameter<bool>("RelativeIsolation");
 
-   produces<L1TrackEmParticleCollection>(label);
+   produces<L1TkEmParticleCollection>(label);
 }
 
-L1TrackEmParticleProducer::~L1TrackEmParticleProducer() {
+L1TkEmParticleProducer::~L1TkEmParticleProducer() {
 }
 
 // ------------ method called to produce the data  ------------
 void
-L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+L1TkEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
 
- std::auto_ptr<L1TrackEmParticleCollection> result(new L1TrackEmParticleCollection);
+ std::auto_ptr<L1TkEmParticleCollection> result(new L1TkEmParticleCollection);
 
 	// the L1EGamma objects
  edm::Handle<L1EmParticleCollection> EGammaHandle;
@@ -137,9 +144,9 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
  iEvent.getByLabel(L1TrackInputTag, L1TkTrackHandle);
  L1TkTrackCollectionType::const_iterator trackIter;
 
-	// the primary vertex (used only if VtxConstrain = true)
+	// the primary vertex (used only if PrimaryVtxConstrain = true)
  float zvtxL1tk = -999;
- if (VtxConstrain) {
+ if (PrimaryVtxConstrain) {
  	edm::Handle<L1TrackPrimaryVertexCollection> L1VertexHandle;
 	iEvent.getByLabel(L1VertexInputTag,L1VertexHandle);
 	std::vector<L1TrackPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
@@ -161,15 +168,16 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     if (bx == 0) {
 
 	float eta = egIter -> eta();
-	if (VtxConstrain) {
+	if (PrimaryVtxConstrain) {
 		// The eta of the L1EG object is seen from (0,0,0).
-		// if VtxConstrain = true, use the zvtxL1tk to correct eta.
+		// if PrimaryVtxConstrain = true, use the zvtxL1tk to correct the eta(L1EG)
+		// that is used in the calculation of DeltaR.
 	   eta = CorrectedEta( (float)eta, zvtxL1tk);
 	}
 	float phi = egIter -> phi();
 	float et = egIter -> et();
 
-	if (et < 10.) continue;
+	if (et < ETmin) continue;
 
 	// calculate the isolation of the L1EG object with
 	// respect to L1Tracks.
@@ -177,7 +185,7 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	float trkisol = -999;
 	float sumPt = 0;
 
-	std::cout << " here an EG w et = " << et << std::endl;
+	//std::cout << " here an EG w et = " << et << std::endl;
 
 	for (trackIter = L1TkTrackHandle->begin(); trackIter != L1TkTrackHandle->end(); ++trackIter) {
 
@@ -186,38 +194,43 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	   float Phi = trackIter->getMomentum().phi();
 	   float z  = trackIter->getVertex().z();
 	   if (fabs(z) > ZMAX) continue;
-    	   if (Pt < PTmin) continue;
+    	   if (Pt < PTMINTRA) continue;
 	   float chi2 = trackIter->getChi2();
 	   if (chi2 > CHI2MAX) continue;
 
-	   if (VtxConstrain) {
+	   if (PrimaryVtxConstrain) {
 	     if ( zvtxL1tk > -999 && fabs( z - zvtxL1tk) >= DeltaZMax) continue;
 	   }
 
 	   float dr = deltaR(Eta, eta, Phi,phi);
 	   if (dr < DRmax && dr >= DRmin)  {
-		std::cout << " a track in the cone, z Pt = " << z << " " << Pt << std::endl;
+		//std::cout << " a track in the cone, z Pt = " << z << " " << Pt << std::endl;
 		sumPt += Pt;
 	   }
 
 	}  // end loop over tracks
 
-	if (et > 0) trkisol = sumPt / et;	// relative isolation
+	if (RelativeIsolation) {
+	    if (et > 0) trkisol = sumPt / et;	// relative isolation
+        }
+        else {	// absolute isolation
+	    trkisol = sumPt ;
+	}
 
     	const math::XYZTLorentzVector P4 = egIter -> p4() ;
-	L1TrackEmParticle trkEm(  P4,
+	L1TkEmParticle trkEm(  P4,
 				EGammaRef,
 				trkisol );
     
-        if (RelIsoCut <= 0) {
-		// write the L1TrackEm particle to the collection, 
+        if (IsoCut <= 0) {
+		// write the L1TkEm particle to the collection, 
 		// irrespective of its relative isolation
 		result -> push_back( trkEm );
 	}
 	else {
 		// the object is written to the collection only
 		// if it passes the isolation cut
-		if (trkisol <= RelIsoCut) result -> push_back( trkEm );
+		if (trkisol <= IsoCut) result -> push_back( trkEm );
 	}
 
      }  // endif bx==0
@@ -230,9 +243,9 @@ L1TrackEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
 // --------------------------------------------------------------------------------------
 
-float L1TrackEmParticleProducer::CorrectedEta(float eta, float zv)  {
+float L1TkEmParticleProducer::CorrectedEta(float eta, float zv)  {
 
-// Correct the eta of teh L1EG object once we know the zvertex
+// Correct the eta of the L1EG object once we know the zvertex
 
 bool IsBarrel = ( fabs(eta) < 1.479 );
 float REcal = 129. ;
@@ -263,7 +276,7 @@ return etaprime;
 
 // --------------------------------------------------------------------------------------
 
-float L1TrackEmParticleProducer::DeltaPhi(float phi1, float phi2) {
+float L1TkEmParticleProducer::DeltaPhi(float phi1, float phi2) {
 // dPhi between 0 and Pi
    float dphi = phi1 - phi2;
    if (dphi < 0) dphi = dphi + 2.*TMath::Pi();
@@ -273,7 +286,7 @@ float L1TrackEmParticleProducer::DeltaPhi(float phi1, float phi2) {
 
 // --------------------------------------------------------------------------------------
 
-float L1TrackEmParticleProducer::deltaR(float eta1, float eta2, float phi1, float phi2) {
+float L1TkEmParticleProducer::deltaR(float eta1, float eta2, float phi1, float phi2) {
     float deta = eta1 - eta2;
     float dphi = DeltaPhi(phi1, phi2);
     float DR= sqrt( deta*deta + dphi*dphi );
@@ -283,19 +296,19 @@ float L1TrackEmParticleProducer::deltaR(float eta1, float eta2, float phi1, floa
 
 // ------------ method called once each job just before starting event loop  ------------
 void
-L1TrackEmParticleProducer::beginJob()
+L1TkEmParticleProducer::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void
-L1TrackEmParticleProducer::endJob() {
+L1TkEmParticleProducer::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
 /*
 void
-L1TrackEmParticleProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
+L1TkEmParticleProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
 {
 }
 */
@@ -303,7 +316,7 @@ L1TrackEmParticleProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetu
 // ------------ method called when ending the processing of a run  ------------
 /*
 void
-L1TrackEmParticleProducer::endRun(edm::Run&, edm::EventSetup const&)
+L1TkEmParticleProducer::endRun(edm::Run&, edm::EventSetup const&)
 {
 }
 */
@@ -311,7 +324,7 @@ L1TrackEmParticleProducer::endRun(edm::Run&, edm::EventSetup const&)
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
 void
-L1TrackEmParticleProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+L1TkEmParticleProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 */
@@ -319,14 +332,14 @@ L1TrackEmParticleProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::Even
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
 void
-L1TrackEmParticleProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+L1TkEmParticleProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
 }
 */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-L1TrackEmParticleProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+L1TkEmParticleProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -335,7 +348,7 @@ L1TrackEmParticleProducer::fillDescriptions(edm::ConfigurationDescriptions& desc
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(L1TrackEmParticleProducer);
+DEFINE_FWK_MODULE(L1TkEmParticleProducer);
 
 
 

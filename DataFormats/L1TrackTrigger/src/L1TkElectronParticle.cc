@@ -1,24 +1,24 @@
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TrackEmParticle
+// Class  :     L1TkEmParticle
 // 
 
-#include "DataFormats/L1TrackTrigger/interface/L1TrackElectronParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticle.h"
 
 
 using namespace l1extra ;
 
 
-L1TrackElectronParticle::L1TrackElectronParticle()
+L1TkElectronParticle::L1TkElectronParticle()
 {
 }
 
-L1TrackElectronParticle::L1TrackElectronParticle( const LorentzVector& p4,
+L1TkElectronParticle::L1TkElectronParticle( const LorentzVector& p4,
          const edm::Ref< L1EmParticleCollection >& egRef,
          const edm::Ptr< L1TkTrackType >& trkPtr,
 	 float tkisol )
-   : L1TrackEmParticle( p4, egRef, tkisol) ,
+   : L1TkEmParticle( p4, egRef, tkisol) ,
      trkPtr_ ( trkPtr )
 
 {

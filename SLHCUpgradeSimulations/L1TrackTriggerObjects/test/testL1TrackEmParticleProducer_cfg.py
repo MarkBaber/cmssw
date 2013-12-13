@@ -9,9 +9,9 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
-    #'file:example_w_Tracks_and_vertex.root'
+    'file:example_w_Tracks_and_vertex.root'
     #'/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/TTbar/BE5D/m1_TTbar_BE5D.root'
-    '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/TTbar/BE5D/TTbar_BE5D_97.root'
+    #'/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/TTbar/BE5D/TTbar_BE5D_97.root'
     )
 )
 
@@ -32,34 +32,69 @@ process.load('Configuration.StandardSequences.L1Reco_cff')
 process.L1Reco = cms.Path( process.l1extraParticles )
 
 
-# --- Now run the L1TrackEmParticleProducer 
+# --- Now run the L1TkEmParticleProducer 
 
 # "photons" :
 
-process.L1TrackPhotons = cms.EDProducer("L1TrackEmParticleProducer",
-	label = cms.string("NonIsolated"),
-	L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
-	L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
-	L1VertexInputTag = cms.InputTag("NotUsed"),
-	ZMAX = cms.double( 25. ),
+process.L1TkPhotons = cms.EDProducer("L1TkEmParticleProducer",
+	label = cms.string("EGIsoTrk"),	# labels the collection of L1TkEmParticleProducer that is produced.
+                                                # e.g. EG or IsoEG if all objects are kept, or
+                                                # EGIsoTrk or IsoEGIsoTrk if only the EG or IsoEG
+                                                # objects that pass a cut RelIso < RelIsoCut are written
+                                                # into the new collection.
+        L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),      # input L1EG collection
+						# When the standard sequences are used :
+						#   - for "old stage-2", use ("l1extraParticles","NonIsolated")
+						#     or ("l1extraParticles","Isolated")
+						#   - for the new clustering algorithm of Jean-Baptiste et al,
+						#     use ("SLHCL1ExtraParticlesNewClustering","IsoEGamma") or
+						#     ("SLHCL1ExtraParticlesNewClustering","EGamma").
+        ETmin = cms.double( -1 ),               # Only the L1EG objects that have ET > ETmin in GeV
+                                                # are considered. ETmin < 0 means that no cut is applied.
+	RelativeIsolation = cms.bool( True ),	# default = True. The isolation variable is relative if True,
+						# else absolute.
+        IsoCut = cms.double( 0.2 ), 		# Cut on the (Trk-based) isolation: only the L1TkEmParticle for which
+                                                # the isolation is below RelIsoCut are written into
+                                                # the output collection. When RelIsoCut < 0, no cut is applied.
+						# When RelativeIsolation = False, IsoCut is in GeV.
+	   # Determination of the isolation w.r.t. L1Tracks :
+        L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
+	ZMAX = cms.double( 25. ),	# in cm
 	CHI2MAX = cms.double( 100. ),
-	DRmin = cms.double( 0.05),
-	DRmax = cms.double( 0.25 ),
-	VtxConstrain = cms.bool( False ),
-	DeltaZMax = cms.double( 999. ),
-	RelIsoCut = cms.double( -1 )
+        PTMINTRA = cms.double( 2. ),	# in GeV
+	DRmin = cms.double( 0.07),
+	DRmax = cms.double( 0.30 ),
+	PrimaryVtxConstrain = cms.bool( False ),  # default = False
+	DeltaZMax = cms.double( 999. ),	   # in cm. Used only when PrimaryVtxConstrain = True
+        L1VertexInputTag = cms.InputTag("NotUsed"),	# Used only when PrimaryVtxConstrain = True
 )
-process.pPhotons = cms.Path( process.L1TrackPhotons )
+process.pPhotons = cms.Path( process.L1TkPhotons )
 
 
-# "electrons" :
+# --- Now run the L1TkElectronProducers : one for the algoritm that
+# --- matches with L1Tracks, the other for the algorithm that matches
+# --- with stubs.
 
-process.L1TrackElectrons = cms.EDProducer("L1TrackElectronParticleProducer",
+
+# "electrons" from L1Tracks :
+
+process.L1TkElectronsTrack = cms.EDProducer("L1TkElectronTrackProducer",
         L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
         L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
         label = cms.string("NonIsolated")
 )
-process.pElectrons = cms.Path( process.L1TrackElectrons )
+process.pElectronsTrack = cms.Path( process.L1TkElectronsTrack )
+
+
+# "electrons" from stubs :
+
+process.L1TkElectronsStubs = cms.EDProducer("L1TkElectronStubsProducer",
+        L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
+        L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),
+        label = cms.string("NonIsolated")
+)
+process.pElectronsStubs = cms.Path( process.L1TkElectronsStubs )
+
 
 
 process.Out = cms.OutputModule( "PoolOutputModule",
@@ -68,9 +103,12 @@ process.Out = cms.OutputModule( "PoolOutputModule",
     outputCommands = cms.untracked.vstring( 'drop *')
 )
 
-#process.Out.outputCommands.append( 'keep *_*_*_Ele' )
-#process.Out.outputCommands.append('keep *_generator_*_*')
-process.Out.outputCommands.append('keep *')
+#process.Out.outputCommands.append('keep *')
+
+process.Out.outputCommands.append('keep *_L1TkPhotons_*_*')
+process.Out.outputCommands.append('keep *_L1TkElectronsStubs_*_*')
+process.Out.outputCommands.append('keep *_L1TkElectronsTrack_*_*')
+process.Out.outputCommands.append('keep *_l1extraParticles_*_*')
 
 process.FEVToutput_step = cms.EndPath(process.Out)
 

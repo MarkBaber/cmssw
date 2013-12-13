@@ -1,20 +1,20 @@
 // -*- C++ -*-
 //
 // Package:     L1Trigger
-// Class  :     L1TrackEmParticle
+// Class  :     L1TkEmParticle
 // 
 
-#include "DataFormats/L1TrackTrigger/interface/L1TrackEmParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkEmParticle.h"
 
 
 using namespace l1extra ;
 
 
-L1TrackEmParticle::L1TrackEmParticle()
+L1TkEmParticle::L1TkEmParticle()
 {
 }
 
-L1TrackEmParticle::L1TrackEmParticle( const LorentzVector& p4,
+L1TkEmParticle::L1TkEmParticle( const LorentzVector& p4,
          const edm::Ref< L1EmParticleCollection >& egRef,
 	 float tkisol )
    : LeafCandidate( ( char ) 0, p4 ),
@@ -25,7 +25,7 @@ L1TrackEmParticle::L1TrackEmParticle( const LorentzVector& p4,
 }
 
 
-int L1TrackEmParticle::bx() const {
+int L1TkEmParticle::bx() const {
  int dummy = -999;
  if ( egRef_.isNonnull() ) {
 	return (getEGRef() -> bx()) ;
