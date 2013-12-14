@@ -80,8 +80,10 @@ process.L1TkPhotons = cms.EDProducer("L1TkEmParticleProducer",
                                                 # into the new collection.
         L1EGammaInputTag = cms.InputTag("l1extraParticles","NonIsolated"),      # input L1EG collection
                                                 # When the standard sequences are used :
-                                                #   - for "old stage-2", use ("l1extraParticles","NonIsolated")
+                                                #   - for the Run-1 algo, use ("l1extraParticles","NonIsolated")
                                                 #     or ("l1extraParticles","Isolated")
+                                                #   - for the "old stage-2" algo (2x2 clustering), use 
+                                                #     ("SLHCL1ExtraParticles","EGamma") or ("SLHCL1ExtraParticles","IsoEGamma")
                                                 #   - for the new clustering algorithm of Jean-Baptiste et al,
                                                 #     use ("SLHCL1ExtraParticlesNewClustering","IsoEGamma") or
                                                 #     ("SLHCL1ExtraParticlesNewClustering","EGamma").
