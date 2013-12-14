@@ -48,9 +48,8 @@
 #include "DataFormats/L1TrackTrigger/interface/L1TkEmParticleFwd.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticle.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticleFwd.h"
-
-
-
+#include "DataFormats/L1TrackTrigger/interface/L1TkJetParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkJetParticleFwd.h"
 
 #include "TFile.h"
 #include "TH1F.h"
@@ -100,6 +99,9 @@ class L1TrackTriggerObjectsAnalyzer : public edm::EDAnalyzer {
 	// for L1TkEmParticles
         edm::InputTag L1TkPhotonsInputTag;
 	edm::InputTag L1TkElectronsInputTag;
+
+	// for L1TkJetParticles
+        edm::InputTag L1TkJetsInputTag;
 };
 
 //
@@ -133,6 +135,7 @@ L1TrackTriggerObjectsAnalyzer::L1TrackTriggerObjectsAnalyzer(const edm::Paramete
   L1TkEtMissInputTag = iConfig.getParameter<edm::InputTag>("L1TkEtMissInputTag");
   L1TkElectronsInputTag = iConfig.getParameter<edm::InputTag>("L1TkElectronsInputTag");
   L1TkPhotonsInputTag = iConfig.getParameter<edm::InputTag>("L1TkPhotonsInputTag");
+  L1TkJetsInputTag = iConfig.getParameter<edm::InputTag>("L1TkJetsInputTag");
 }
 
 
@@ -241,6 +244,34 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 	float zvtx = vtxRef -> getZvertex();
         float etMissPU = etmIter -> etMissPU();
 	std::cout << " ETmiss = " << etmis << " for zvtx = " << zvtx << " and ETmiss from PU = " << etMissPU << std::endl;
+    }
+ }
+
+
+        //
+        // ----------------------------------------------------------------------
+        // retrieve the L1TkJetParticle objects
+        //
+        
+ edm::Handle<L1TkJetParticleCollection> L1TkJetsHandle;
+ iEvent.getByLabel(L1TkJetsInputTag, L1TkJetsHandle);
+ std::vector<L1TkJetParticle>::const_iterator jetIter ;
+
+ if ( L1TkJetsHandle.isValid() ) {
+    std::cout << " -----   L1TkJetParticle  objects -----  " << std::endl;
+    for (jetIter = L1TkJetsHandle -> begin(); jetIter != L1TkJetsHandle->end(); ++jetIter) {
+        float et = jetIter -> pt();
+        float phi = jetIter -> phi();
+        float eta = jetIter -> eta();
+        int bx = jetIter -> bx() ;
+	float jetvtx = jetIter -> getJetVtx();
+        const edm::Ref< L1JetParticleCollection > Jetref = jetIter -> getJetRef();
+        float et_L1Jet = Jetref -> et();
+	L1JetParticle::JetType type = Jetref -> type();
+
+        std::cout << " a Jet candidate ET eta phi zvertex " << et << " " << eta << " " << phi << " " << jetvtx  << std::endl;
+        std::cout << "                Calo  ET, typ " << et_L1Jet << " " << type << std::endl;
+        std::cout << "                bx = " << bx << std::endl;
     }
  }
 

@@ -1,68 +1,77 @@
 {
 
 //TFile f("MinBias_Em_from_Run1_L1EG.root");
-TFile f("example_all.root");
+
+TChain* Events = new TChain("Events");
+Events -> Add("MinBias_Em_TrkMET_1.root");
+Events -> Add("MinBias_Em_TrkMET_2.root");
 
 gStyle->SetOptStat(0);
 
+int nbins=90;
+float x1 = 4.5;
+float x2 = 94.5;
 	// Run-1 algos :
 
-TH1F* h1 = new TH1F("hIsoTtk",";ET (GeV); Events",100,-0.5,99.5) ;
-TH1F* h2 = new TH1F("hEG",";ET (GeV); Events",100,-0.5,99.5) ;
-TH1F* h3 = new TH1F("hIsoEG",";ET (GeV); Events",100,-0.5,99.5) ;
-TH1F* h4 = new TH1F("hIsoEGIsoTtk",";ET (GeV); Events",100,-0.5,99.5) ;
+TH1F* h1 = new TH1F("hIsoTtk",";ET (GeV); Events",nbins,x1,x2);
+TH1F* h2 = new TH1F("hEG",";ET (GeV); Events",nbins,x1,x2);
+TH1F* h3 = new TH1F("hIsoEG",";ET (GeV); Events",nbins,x1,x2);
+TH1F* h4 = new TH1F("hIsoEGIsoTtk",";ET (GeV); Events",nbins,x1,x2);
 
-TH1F* h1int = new TH1F("hIsoTtkint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
-TH1F* h2int = new TH1F("hEGint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
-TH1F* h3int = new TH1F("hIsoEGint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
-TH1F* h4int = new TH1F("hIsoEGIsoTtkint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
+TH1F* h1int = new TH1F("hIsoTtkint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* h2int = new TH1F("hEGint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* h3int = new TH1F("hIsoEGint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* h4int = new TH1F("hIsoEGIsoTtkint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
 
-Events->Draw("l1extraL1EmParticles_l1extraParticles_NonIsolated_ALL.obj.pt_[0]>>hEG") ;
-Events->Draw("l1extraL1TkEmParticles_L1TkPhotonsRun1EG_IsoTrk_ALL.obj.pt_[0]>>hIsoTtk") ;
-Events->Draw("l1extraL1EmParticles_l1extraParticles_Isolated_ALL.obj.pt_[0]>>hIsoEG") ;
-Events->Draw("l1extraL1TkEmParticles_L1TkPhotonsRunIso1EG_IsoTrk_ALL.obj.pt_[0]>>hIsoEGIsoTtk") ;
+Events->Draw("TMath::Max(TMath::Max(l1extraL1EmParticles_l1extraParticles_NonIsolated_ALL.obj.pt_[1],l1extraL1EmParticles_l1extraParticles_Isolated_ALL.obj.pt_[1]),  TMath::Max(l1extraL1EmParticles_l1extraParticles_NonIsolated_ALL.obj.pt_[0],l1extraL1EmParticles_l1extraParticles_Isolated_ALL.obj.pt_[0]) )>>hEG") ;
+
+Events->Draw("TMath::Max(TMath::Max(l1extraL1TkEmParticles_L1TkPhotonsRun1EG_IsoTrk_ALL.obj.pt_[1],l1extraL1TkEmParticles_L1TkPhotonsRunIso1EG_IsoTrk_ALL.obj.pt_[1]), TMath::Max(l1extraL1TkEmParticles_L1TkPhotonsRun1EG_IsoTrk_ALL.obj.pt_[0],l1extraL1TkEmParticles_L1TkPhotonsRunIso1EG_IsoTrk_ALL.obj.pt_[0]))>>hIsoTtk") ;
+
+Events->Draw("TMath::Max(l1extraL1EmParticles_l1extraParticles_Isolated_ALL.obj.pt_[1],l1extraL1EmParticles_l1extraParticles_Isolated_ALL.obj.pt_[0])>>hIsoEG") ;
+
+Events->Draw("TMath::Max(l1extraL1TkEmParticles_L1TkPhotonsRunIso1EG_IsoTrk_ALL.obj.pt_[1],l1extraL1TkEmParticles_L1TkPhotonsRunIso1EG_IsoTrk_ALL.obj.pt_[0])>>hIsoEGIsoTtk") ;
 
 	// old Stage-2 algos :
 
-TH1F* g1 = new TH1F("gIsoTtk",";ET (GeV); Events",100,-0.5,99.5) ;
-TH1F* g2 = new TH1F("gEG",";ET (GeV); Events",100,-0.5,99.5) ;
-TH1F* g3 = new TH1F("gIsoEG",";ET (GeV); Events",100,-0.5,99.5) ;
-TH1F* g4 = new TH1F("gIsoEGIsoTtk",";ET (GeV); Events",100,-0.5,99.5) ;
+TH1F* g1 = new TH1F("gIsoTtk",";ET (GeV); Events",nbins,x1,x2);
+TH1F* g2 = new TH1F("gEG",";ET (GeV); Events",nbins,x1,x2);
+TH1F* g3 = new TH1F("gIsoEG",";ET (GeV); Events",nbins,x1,x2);
+TH1F* g4 = new TH1F("gIsoEGIsoTtk",";ET (GeV); Events",nbins,x1,x2);
 
-TH1F* g1int = new TH1F("gIsoTtkint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
-TH1F* g2int = new TH1F("gEGint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
-TH1F* g3int = new TH1F("gIsoEGint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
-TH1F* g4int = new TH1F("gIsoEGIsoTtkint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
+TH1F* g1int = new TH1F("gIsoTtkint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* g2int = new TH1F("gEGint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* g3int = new TH1F("gIsoEGint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* g4int = new TH1F("gIsoEGIsoTtkint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
 
-Events->Draw("l1extraL1EmParticles_SLHCL1ExtraParticles_EGamma_ALL.obj.pt_[0]>>gEG") ;
-Events->Draw("l1extraL1TkEmParticles_L1TkPhotonsStage2EG_IsoTrk_ALL.obj.pt_[0]>>gIsoTtk") ;
-Events->Draw("l1extraL1EmParticles_SLHCL1ExtraParticles_IsoEGamma_ALL.obj.pt_[0]>>gIsoEG") ;
-Events->Draw("l1extraL1TkEmParticles_L1TkPhotonsStage2IsoEG_IsoTrk_ALL.obj.pt_[0]>>gIsoEGIsoTtk") ;
+Events->Draw("TMath::Max(l1extraL1EmParticles_SLHCL1ExtraParticles_EGamma_ALL.obj.pt_[1],l1extraL1EmParticles_SLHCL1ExtraParticles_EGamma_ALL.obj.pt_[0])>>gEG") ;
+Events->Draw("TMath::Max(l1extraL1TkEmParticles_L1TkPhotonsStage2EG_IsoTrk_ALL.obj.pt_[1],l1extraL1TkEmParticles_L1TkPhotonsStage2EG_IsoTrk_ALL.obj.pt_[0])>>gIsoTtk") ;
+Events->Draw("TMath::Max(l1extraL1EmParticles_SLHCL1ExtraParticles_IsoEGamma_ALL.obj.pt_[1],l1extraL1EmParticles_SLHCL1ExtraParticles_IsoEGamma_ALL.obj.pt_[0])>>gIsoEG") ;
+Events->Draw("TMath::Max(l1extraL1TkEmParticles_L1TkPhotonsStage2IsoEG_IsoTrk_ALL.obj.pt_[1],l1extraL1TkEmParticles_L1TkPhotonsStage2IsoEG_IsoTrk_ALL.obj.pt_[0])>>gIsoEGIsoTtk") ;
 
 	// new clustering :
 
-TH1F* j1 = new TH1F("jIsoTtk",";ET (GeV); Events",100,-0.5,99.5) ;
-TH1F* j2 = new TH1F("jEG",";ET (GeV); Events",100,-0.5,99.5) ;
-TH1F* j3 = new TH1F("jIsoEG",";ET (GeV); Events",100,-0.5,99.5) ;
-TH1F* j4 = new TH1F("jIsoEGIsoTtk",";ET (GeV); Events",100,-0.5,99.5) ;
+TH1F* j1 = new TH1F("jIsoTtk",";ET (GeV); Events",nbins,x1,x2);
+TH1F* j2 = new TH1F("jEG",";ET (GeV); Events",nbins,x1,x2);
+TH1F* j3 = new TH1F("jIsoEG",";ET (GeV); Events",nbins,x1,x2);
+TH1F* j4 = new TH1F("jIsoEGIsoTtk",";ET (GeV); Events",nbins,x1,x2);
 
-TH1F* j1int = new TH1F("jIsoTtkint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
-TH1F* j2int = new TH1F("jEGint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
-TH1F* j3int = new TH1F("jIsoEGint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
-TH1F* j4int = new TH1F("jIsoEGIsoTtkint",";ET threshold (GeV); Rate (kHz)",100,-0.5,99.5) ;
+TH1F* j1int = new TH1F("jIsoTtkint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* j2int = new TH1F("jEGint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* j3int = new TH1F("jIsoEGint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* j4int = new TH1F("jIsoEGIsoTtkint",";ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
 
-Events->Draw("l1extraL1EmParticles_SLHCL1ExtraParticles_EGamma_ALL.obj.pt_[0]>>jEG") ;
-Events->Draw("l1extraL1TkEmParticles_L1TkPhotonsNewEG_IsoTrk_ALL.obj.pt_[0]>>jIsoTtk") ;
-Events->Draw("l1extraL1EmParticles_SLHCL1ExtraParticles_IsoEGamma_ALL.obj.pt_[0]>>jIsoEG") ;
-Events->Draw("l1extraL1TkEmParticles_L1TkPhotonsStage2IsoEG_IsoTrk_ALL.obj.pt_[0]>>jIsoEGIsoTtk") ;
+Events->Draw("TMath::Max(l1extraL1EmParticles_SLHCL1ExtraParticlesNewClustering_EGamma_ALL.obj.pt_[1],l1extraL1EmParticles_SLHCL1ExtraParticlesNewClustering_EGamma_ALL.obj.pt_[0])>>jEG") ;
+Events->Draw("TMath::Max(l1extraL1TkEmParticles_L1TkPhotonsNewEG_IsoTrk_ALL.obj.pt_[1],l1extraL1TkEmParticles_L1TkPhotonsNewEG_IsoTrk_ALL.obj.pt_[0])>>jIsoTtk") ;
+Events->Draw("TMath::Max(l1extraL1EmParticles_SLHCL1ExtraParticlesNewClustering_IsoEGamma_ALL.obj.pt_[1],l1extraL1EmParticles_SLHCL1ExtraParticlesNewClustering_IsoEGamma_ALL.obj.pt_[0])>>jIsoEG") ;
+Events->Draw("TMath::Max(l1extraL1TkEmParticles_L1TkPhotonsNewIsoEG_IsoTrk_ALL.obj.pt_[1],l1extraL1TkEmParticles_L1TkPhotonsNewIsoEG_IsoTrk_ALL.obj.pt_[0])>>jIsoEGIsoTtk") ;
 
 
 
-for (int i=0; i <= 100; i++) {
-  float v1 = h1->Integral(i,101); 
-  float v2 = h2 -> Integral(i,101);
-  float v3 = h3 -> Integral(i,101);
-  float v4 = h4 -> Integral(i,101);
+for (int i=0; i <= nbins+1; i++) {
+  float v1 = h1->Integral(i,nbins+1); 
+  float v2 = h2 -> Integral(i,nbins+1);
+  float v3 = h3 -> Integral(i,nbins+1);
+  float v4 = h4 -> Integral(i,nbins+1);
 
   h1int -> SetBinContent(i, v1);
   h2int -> SetBinContent(i, v2);
@@ -70,8 +79,8 @@ for (int i=0; i <= 100; i++) {
   h4int -> SetBinContent(i, v4);
 }
 
-//float nevts = 149500. ;
-float nevts = 20000;
+float nevts = 149500. ;
+//float nevts = 20000;
 
 h1int -> Scale( 30000./nevts);
 h2int -> Scale( 30000./nevts);
@@ -79,11 +88,11 @@ h3int -> Scale( 30000./nevts);
 h4int -> Scale( 30000./nevts);
 
 
-for (int i=0; i <= 100; i++) {
-  float v1 = g1->Integral(i,101);
-  float v2 = g2 -> Integral(i,101);
-  float v3 = g3 -> Integral(i,101);
-  float v4 = g4 -> Integral(i,101);
+for (int i=0; i <= nbins+1; i++) {
+  float v1 = g1->Integral(i,nbins+1);
+  float v2 = g2 -> Integral(i,nbins+1);
+  float v3 = g3 -> Integral(i,nbins+1);
+  float v4 = g4 -> Integral(i,nbins+1);
 
   g1int -> SetBinContent(i, v1);
   g2int -> SetBinContent(i, v2);
@@ -97,11 +106,11 @@ g3int -> Scale( 30000./nevts);
 g4int -> Scale( 30000./nevts);
 
 
-for (int i=0; i <= 100; i++) {
-  float v1 = j1->Integral(i,101);
-  float v2 = j2 -> Integral(i,101);
-  float v3 = j3 -> Integral(i,101);
-  float v4 = j4 -> Integral(i,101);
+for (int i=0; i <= nbins+1; i++) {
+  float v1 = j1->Integral(i,nbins+1);
+  float v2 = j2 -> Integral(i,nbins+1);
+  float v3 = j3 -> Integral(i,nbins+1);
+  float v4 = j4 -> Integral(i,nbins+1);
 
   j1int -> SetBinContent(i, v1);
   j2int -> SetBinContent(i, v2);
@@ -117,7 +126,8 @@ j4int -> Scale( 30000./nevts);
 
 TCanvas* c1 = new TCanvas("c1","c1");
 
-h1int -> SetMinimum(10);
+float rmin = 10.;
+h1int -> SetMinimum(rmin);
 h1int -> SetMaximum(40000.);
 h1int -> Draw();
 h2int -> SetLineColor(2);
@@ -149,7 +159,7 @@ gPad -> SetGridy(1);
 
 TCanvas* c2 = new TCanvas("c2","c2");
 
-g1int -> SetMinimum(10);
+g1int -> SetMinimum(rmin);
 g1int -> SetMaximum(40000.);
 g1int -> Draw();
 g2int -> SetLineColor(2);
@@ -168,7 +178,7 @@ leg2->Draw("same");
 
 TCanvas* c3 = new TCanvas("c3","c3");
 
-j1int -> SetMinimum(10);
+j1int -> SetMinimum(rmin);
 j1int -> SetMaximum(40000.);
 j1int -> Draw();
 j2int -> SetLineColor(2);

@@ -15,6 +15,9 @@
 #include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticle.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticleFwd.h"
 
+#include "DataFormats/L1TrackTrigger/interface/L1TkJetParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkJetParticleFwd.h"
+
 #include "DataFormats/Common/interface/Wrapper.h"
 #include "DataFormats/Common/interface/RefVector.h"
 #include "DataFormats/Common/interface/RefProd.h"
@@ -53,6 +56,11 @@ namespace {
      l1extra::L1TkElectronParticleCollection trkeleColl ;
      edm::Wrapper<l1extra::L1TkElectronParticleCollection> w_trkeleColl;
      l1extra::L1TkElectronParticleRef reftrkEle ;
+
+	// L1TkJetParticle
+     l1extra::L1TkJetParticleCollection trkjetColl ;
+     edm::Wrapper<l1extra::L1TkJetParticleCollection> w_trkjetColl;
+     l1extra::L1TkJetParticleRef reftrkJet ;
 
 
 

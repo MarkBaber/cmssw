@@ -134,9 +134,26 @@ process.L1TkElectronsStubs = cms.EDProducer("L1TkElectronStubsProducer",
 process.pElectronsStubs = cms.Path( process.L1TkElectronsStubs )
 
 
-
 #
 # ---------------------------------------------------------------------------
+
+# test the L1TkJetProducer
+# The collection of (Run 1) L1Jets have been created above, by unpacking the
+# gctDigis and running process.L1Reco.
+
+# --- Now run the L1TkJetProducer 
+
+process.L1TkJets = cms.EDProducer("L1TkJetProducer",
+        L1CentralJetInputTag = cms.InputTag("l1extraParticles","Central"),      # for Run-1 algos
+        L1ForwardJetInputTag = cms.InputTag("l1extraParticles","Forward"),      # for Run-1 algos
+        L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
+        # cuts on the tracks used to determined the zvertex of the jet (examples) :
+        #ZMAX = cms.double( 25. ),      # in cm
+        #CHI2MAX = cms.double( 100. ),
+        #PTMINTRA = cms.double( 2. ),   # in GeV
+)
+process.pJets = cms.Path( process.L1TkJets )
+
 
 # ---------------------------------------------------------------------------
 #
@@ -146,7 +163,8 @@ process.ana = cms.EDAnalyzer( 'L1TrackTriggerObjectsAnalyzer' ,
     L1VtxInputTag = cms.InputTag("L1TkPrimaryVertex"),
     L1TkEtMissInputTag = cms.InputTag("L1TkEtMiss","MET"),
     L1TkElectronsInputTag = cms.InputTag("L1TkElectronsTrack","NonIsolated"),
-    L1TkPhotonsInputTag = cms.InputTag("L1TkPhotons","EGIsoTrk")
+    L1TkPhotonsInputTag = cms.InputTag("L1TkPhotons","EGIsoTrk"),
+    L1TkJetsInputTag = cms.InputTag("L1TkJets","Central")
 )
 
 

@@ -149,14 +149,40 @@ L1TkEmParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
  if (PrimaryVtxConstrain) {
  	edm::Handle<L1TrackPrimaryVertexCollection> L1VertexHandle;
 	iEvent.getByLabel(L1VertexInputTag,L1VertexHandle);
-	std::vector<L1TrackPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
-	   // by convention, the first vertex in the collection is the one that should
-	   // be used by default
-	zvtxL1tk = vtxIter -> getZvertex();
+	if (!L1VertexHandle.isValid() ) {
+	   LogWarning("L1TkEmParticleProducer")
+            << "\nWarning: L1TrackPrimaryVertexCollection with " << L1VertexInputTag
+            << "\nrequested in configuration, but not found in the event. Won't use any PrimaryVertex constraint."
+            << std::endl;
+	    PrimaryVtxConstrain = false;
+	}
+	else {
+	    std::vector<L1TrackPrimaryVertex>::const_iterator vtxIter = L1VertexHandle->begin();
+	       // by convention, the first vertex in the collection is the one that should
+	       // be used by default
+	    zvtxL1tk = vtxIter -> getZvertex();
+	}
  }
 
+ if (!L1TkTrackHandle.isValid() ) {
+          LogError("L1TkEmParticleProducer")
+            << "\nWarning: L1TkTrackCollectionType with " << L1TrackInputTag
+            << "\nrequested in configuration, but not found in the event. Exit."
+            << std::endl;
+           return;
+ }
 
 	// Now loop over the L1EGamma objects
+
+ if( !EGammaHandle.isValid() )
+        {
+          LogError("L1TkEmParticleProducer")
+            << "\nWarning: L1EmParticleCollection with " << L1EGammaInputTag
+            << "\nrequested in configuration, but not found in the event. Exit."
+            << std::endl;
+	   return;
+        }
+
  int ieg = 0;
  for (egIter = EGammaHandle->begin();  egIter != EGammaHandle->end(); ++egIter) {
 
