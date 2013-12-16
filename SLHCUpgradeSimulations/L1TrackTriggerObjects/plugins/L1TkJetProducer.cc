@@ -64,7 +64,6 @@ class L1TkJetProducer : public edm::EDProducer {
 
       // ----------member data ---------------------------
 	edm::InputTag L1CentralJetInputTag;
-        edm::InputTag L1ForwardJetInputTag;
 	edm::InputTag L1TrackInputTag;
 
 } ;
@@ -77,12 +76,9 @@ L1TkJetProducer::L1TkJetProducer(const edm::ParameterSet& iConfig)
 {
 
    L1CentralJetInputTag = iConfig.getParameter<edm::InputTag>("L1CentralJetInputTag") ;
-   L1ForwardJetInputTag = iConfig.getParameter<edm::InputTag>("L1ForwardJetInputTag") ;
    L1TrackInputTag = iConfig.getParameter<edm::InputTag>("L1TrackInputTag");
    
-
    produces<L1TkJetParticleCollection>("Central");
-   produces<L1TkJetParticleCollection>("Forward");
 
 }
 
@@ -96,14 +92,9 @@ L1TkJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace edm;
 
  std::auto_ptr<L1TkJetParticleCollection> cenTkJets(new L1TkJetParticleCollection);
- std::auto_ptr<L1TkJetParticleCollection> fwdTkJets(new L1TkJetParticleCollection);
 
  edm::Handle<L1JetParticleCollection> CentralJetHandle;
  iEvent.getByLabel(L1CentralJetInputTag,CentralJetHandle);
-
- edm::Handle<L1JetParticleCollection> ForwardJetHandle;
- iEvent.getByLabel(L1ForwardJetInputTag,ForwardJetHandle);
-
  std::vector<L1JetParticle>::const_iterator jetIter ;
 
  edm::Handle<L1TkTrackCollectionType> L1TkTrackHandle;
@@ -145,42 +136,7 @@ L1TkJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 
-	// forward jets
-
- if( !ForwardJetHandle.isValid() )
-        {
-          LogError("L1TkJetProducer")
-            << "\nWarning: L1JetParticleCollection with " << L1ForwardJetInputTag
-            << "\nrequested in configuration, but not found in the event."
-            << std::endl;
-        }
- else {
-
-    int ijet = 0;
-    for (jetIter = ForwardJetHandle->begin();  jetIter != ForwardJetHandle->end(); ++jetIter) {
-
-       edm::Ref< L1JetParticleCollection > JetRef( ForwardJetHandle, ijet );
-       ijet ++;
-
-       int ibx = jetIter -> bx();
-       if (ibx != 0) continue;
-
-           // calculate the vertex of the jet. Here dummy.
-           float jetvtx = -999;
-
-           const math::XYZTLorentzVector P4 = jetIter -> p4() ;
-           L1TkJetParticle trkJet(  P4,
-                                   JetRef,
-                                   jetvtx );
-
-               fwdTkJets -> push_back( trkJet );
-
-    }  // end loop over Jet objects
- } // endif ForwardJetHandle.isValid()
-
-
  iEvent.put( cenTkJets, "Central" );
- iEvent.put( fwdTkJets, "Forward" );
 
 }
 

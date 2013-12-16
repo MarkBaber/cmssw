@@ -36,7 +36,6 @@ process.L1Reco = cms.Path( process.l1extraParticles )
 
 process.L1TkJets = cms.EDProducer("L1TkJetProducer",
         L1CentralJetInputTag = cms.InputTag("l1extraParticles","Central"),      # for Run-1 algos
-        L1ForwardJetInputTag = cms.InputTag("l1extraParticles","Forward"),      # for Run-1 algos
         L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
 	# cuts on the tracks used to determined the zvertex of the jet (examples) :
 	#ZMAX = cms.double( 25. ),	# in cm

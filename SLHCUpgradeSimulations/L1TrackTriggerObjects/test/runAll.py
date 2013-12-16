@@ -4,14 +4,14 @@ process = cms.Process("ALL")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5) )
 
 from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import *
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-	'file:example_w_Tracks_and_vertex.root'
-    #'/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/TTbar/BE5D/TTbar_BE5D_97.root'
+	#'file:example_w_Tracks_and_vertex.root'
+    '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/TTbar/BE5D/zmatchingOff/m1_TTbar_BE5D.root'
     )
 )
 
@@ -145,7 +145,6 @@ process.pElectronsStubs = cms.Path( process.L1TkElectronsStubs )
 
 process.L1TkJets = cms.EDProducer("L1TkJetProducer",
         L1CentralJetInputTag = cms.InputTag("l1extraParticles","Central"),      # for Run-1 algos
-        L1ForwardJetInputTag = cms.InputTag("l1extraParticles","Forward"),      # for Run-1 algos
         L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
         # cuts on the tracks used to determined the zvertex of the jet (examples) :
         #ZMAX = cms.double( 25. ),      # in cm
@@ -154,17 +153,33 @@ process.L1TkJets = cms.EDProducer("L1TkJetProducer",
 )
 process.pJets = cms.Path( process.L1TkJets )
 
+#
+# ---------------------------------------------------------------------------
+
+# HT and MHT from L1TkHTMissProducer
+# The collection of (Run 1) L1Jets have been created above, by unpacking the
+# gctDigis and running process.L1Reco.
+
+process.L1TkHTMiss = cms.EDProducer("L1TkHTMissProducer",
+	L1TkJetInputTag = cms.InputTag("L1TkJets","Central"),
+	DeltaZ = cms.double( 999 ),   #  in mm. Here dummy cut, since I dont have the zvtx of the jets 
+	PrimaryVtxConstrain = cms.bool( True ),
+	L1VertexInputTag = cms.InputTag("L1TrackPrimaryVertex")
+)
+process.pHTM = cms.Path( process.L1TkHTMiss )
+
 
 # ---------------------------------------------------------------------------
 #
 # --- Run the analyzer
 
 process.ana = cms.EDAnalyzer( 'L1TrackTriggerObjectsAnalyzer' ,
-    L1VtxInputTag = cms.InputTag("L1TkPrimaryVertex"),
+    L1VtxInputTag = cms.InputTag("L1TrackPrimaryVertex"),
     L1TkEtMissInputTag = cms.InputTag("L1TkEtMiss","MET"),
     L1TkElectronsInputTag = cms.InputTag("L1TkElectronsTrack","NonIsolated"),
     L1TkPhotonsInputTag = cms.InputTag("L1TkPhotons","EGIsoTrk"),
-    L1TkJetsInputTag = cms.InputTag("L1TkJets","Central")
+    L1TkJetsInputTag = cms.InputTag("L1TkJets","Central"),
+    L1TkHTMInputTag = cms.InputTag("L1TkHTMiss")
 )
 
 

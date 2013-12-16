@@ -16,6 +16,8 @@ namespace l1extra {
 
    class L1TkJetParticle ;
 
+   typedef edm::RefProd< L1TkJetParticle > L1TkJetParticleRefProd ;
+
    typedef std::vector< L1TkJetParticle > L1TkJetParticleCollection ;
 
    typedef edm::Ref< L1TkJetParticleCollection > L1TkJetParticleRef ;

@@ -50,6 +50,8 @@
 #include "DataFormats/L1TrackTrigger/interface/L1TkElectronParticleFwd.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TkJetParticle.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TkJetParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkHTMissParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkHTMissParticleFwd.h"
 
 #include "TFile.h"
 #include "TH1F.h"
@@ -102,6 +104,9 @@ class L1TrackTriggerObjectsAnalyzer : public edm::EDAnalyzer {
 
 	// for L1TkJetParticles
         edm::InputTag L1TkJetsInputTag;
+
+	// for L1TkHTMParticle
+	edm::InputTag L1TkHTMInputTag;
 };
 
 //
@@ -136,6 +141,7 @@ L1TrackTriggerObjectsAnalyzer::L1TrackTriggerObjectsAnalyzer(const edm::Paramete
   L1TkElectronsInputTag = iConfig.getParameter<edm::InputTag>("L1TkElectronsInputTag");
   L1TkPhotonsInputTag = iConfig.getParameter<edm::InputTag>("L1TkPhotonsInputTag");
   L1TkJetsInputTag = iConfig.getParameter<edm::InputTag>("L1TkJetsInputTag");
+  L1TkHTMInputTag = iConfig.getParameter<edm::InputTag>("L1TkHTMInputTag");
 }
 
 
@@ -274,6 +280,35 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
         std::cout << "                bx = " << bx << std::endl;
     }
  }
+
+        //
+        // ----------------------------------------------------------------------
+        // retrieve HT and HTM
+	//
+
+ edm::Handle<L1TkHTMissParticleCollection> L1TkHTMHandle;
+ iEvent.getByLabel(L1TkHTMInputTag, L1TkHTMHandle);
+
+ if ( L1TkHTMHandle.isValid() ) {
+	std::cout << " -----  L1TkHTMissParticle: size (should be 1) = " << L1TkHTMHandle -> size() << std::endl;
+	std::vector<L1TkHTMissParticle>::const_iterator HTMIter = L1TkHTMHandle -> begin();
+	float HTT = HTMIter -> EtTotal();
+	float HTM = HTMIter -> EtMiss();
+	//float HTM_the_same = HTMIter -> et();
+
+	// phi of the HTM vector :
+	float phi = HTMIter -> phi();
+	std::cout << " HTT = " << HTT << " HTM = " << HTM << " " << "phi(HTM) = " << phi << std::endl;
+	 
+	// access the L1TkJets used to build HT and HTM :
+	const edm::RefProd< L1TkJetParticleCollection > jetCollRef = HTMIter -> getjetCollectionRef();
+ 	std::vector<L1TkJetParticle>::const_iterator jet = jetCollRef -> begin();
+	std::cout << " ET of the first L1TkJet = " << jet -> et() << std::endl;
+ }
+ else {
+    std::cout << L1TkHTMInputTag << " is non valid." << std::endl;
+ }
+
 
         //
         // ----------------------------------------------------------------------
