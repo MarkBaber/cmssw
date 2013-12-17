@@ -1,17 +1,28 @@
 import FWCore.ParameterSet.Config as cms
 
+# Example configuratiom file that runs over a file that has
+# already the L1Tracks.
+# (see runL1Tracks.py for how to produce them).
+
+# Here we run the L1EG algorithms (old stage-2 and new clustering),
+# we unpack the L1EG objects that were created during the L1 step
+# of the central production (i.e. the Run-1 algorithms), and we
+# create L1TkEm objects corresponding to the various input
+# collections.
+
+
 process = cms.Process("ALL")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import *
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-       '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/MinBias/BE5D/zmatchingOff/m1_MinBias_BE5D.root',
-       '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/MinBias/BE5D/zmatchingOff/m2_MinBias_BE5D.root'
+   '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/Hgaga/BE5D/zmatchingOff/m1_Hgaga_BE5D.root',
+   '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/Hgaga/BE5D/zmatchingOff/m2_Hgaga_BE5D.root'
     )
 )
 
@@ -182,6 +193,7 @@ process.Out.outputCommands.append('keep *_SLHCL1ExtraParticles_IsoEGamma_*')
 process.Out.outputCommands.append('keep *_SLHCL1ExtraParticlesNewClustering_EGamma_*')
 process.Out.outputCommands.append('keep *_SLHCL1ExtraParticlesNewClustering_IsoEGamma_*')
 process.Out.outputCommands.append('keep *_l1extraParticles_MET_*')
+process.Out.outputCommands.append('keep *_gen*_*_*')
 
 
 process.FEVToutput_step = cms.EndPath(process.Out)
