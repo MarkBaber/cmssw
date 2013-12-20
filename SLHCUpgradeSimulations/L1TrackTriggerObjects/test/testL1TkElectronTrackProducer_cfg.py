@@ -93,26 +93,30 @@ process.L1Reco = cms.Path( process.l1extraParticles )
 # "electrons" :
 
 process.L1TkElectrons = cms.EDProducer("L1TkElectronTrackProducer",
-	label = cms.string("ElecTrk"),	# labels the collection of L1TkEmParticleProducer that is produced.
-                                        # e.g. Elec or IsoElec if all objects are kept, or
-                                        # ElecIsoTrk or IsoElecIsoTrk if only the EG or IsoEG
+	label = cms.string("EGIsoTrk"),	# labels the collection of L1TkEmParticleProducer that is produced.
+                                        # e.g. EG or IsoEGc if all objects are kept, or
+                                        # EGIsoTrk or IsoEGIsoTrk if only the EG or IsoEG
                                         # objects that pass a cut RelIso < RelIsoCut are written
                                         # into the new collection.
         L1EGammaInputTag = cms.InputTag("SLHCL1ExtraParticles","EGamma"),      # input EGamma collection
 					# When the standard sequences are used :
-					#   - for "old stage-2", use ("l1extraParticles","NonIsolated")
-					#     or ("l1extraParticles","Iolated")
-					#   - for the new clustering algorithm of Jean-Baptiste et al,
-					#     use ("SLHCL1ExtraParticlesNewClustering","IsoEGamma") or
-					#     ("SLHCL1ExtraParticlesNewClustering","EGamma").                                      
-        ETmin = cms.double( 20.0 ),       # Only the L1EG objects that have ET > ETmin in GeV
+                                                #   - for the Run-1 algo, use ("l1extraParticles","NonIsolated")
+                                                #     or ("l1extraParticles","Isolated")
+                                                #   - for the "old stage-2" algo (2x2 clustering), use 
+                                                #     ("SLHCL1ExtraParticles","EGamma") or ("SLHCL1ExtraParticles","IsoEGamma")
+                                                #   - for the new clustering algorithm of Jean-Baptiste et al,
+                                                #     use ("SLHCL1ExtraParticlesNewClustering","IsoEGamma") or
+                                                #     ("SLHCL1ExtraParticlesNewClustering","EGamma").
+        ETmin = cms.double( 5.0 ),       # Only the L1EG objects that have ET > ETmin in GeV
+                                                # are considered. ETmin < 0 means that no cut is applied.
         TrackEGammaDeltaPhi = cms.double(0.1),  # Delta Phi cutoff to match Track with L1EG objects
         TrackEGammaDeltaR = cms.double(0.06),   # Delta R cutoff to match Track with L1EG objects
         TrackEGammaDeltaEta = cms.double(0.05), # Delta Eta cutoff to match Track with L1EG objects
                                                 # are considered. ETmin < 0 means that no cut is applied.
 	RelativeIsolation = cms.bool( True ),	# default = True. The isolation variable is relative if True,
 						# else absolute.
-        IsoCut = cms.double( 0.1 ), 		# Cut on the (Trk-based) isolation: only the L1TkEmParticle for which
+	IsoCut = cms.double( -1. ),
+        #IsoCut = cms.double( 0.1 ), 		# Cut on the (Trk-based) isolation: only the L1TkEmParticle for which
                                                 # the isolation is below RelIsoCut are written into
                                                 # the output collection. When RelIsoCut < 0, no cut is applied.
 						# When RelativeIsolation = False, IsoCut is in GeV.
@@ -134,7 +138,7 @@ process.Out = cms.OutputModule( "PoolOutputModule",
 )
 
 process.Out.outputCommands.append( 'keep *_SLHCL1ExtraParticles_EGamma_*' )
-process.Out.outputCommands.append( 'keep *_L1TrackElectrons_NonIsolated_*' )
+process.Out.outputCommands.append( 'keep *_L1TkElectrons_*_*' )
 #process.Out.outputCommands.append('keep *_generator_*_*')
 #process.Out.outputCommands.append('keep *')
 
