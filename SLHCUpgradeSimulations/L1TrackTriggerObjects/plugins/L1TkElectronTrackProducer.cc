@@ -47,7 +47,7 @@
 
 // Matching Algorithm
 #include "SLHCUpgradeSimulations/L1TrackTriggerObjects/interface/L1TkElectronTrackMatchAlgo.h"
-#include "SLHCUpgradeSimulations/L1TrackTriggerObjects/interface/L1TkElectronEtComparator.h"
+//#include "SLHCUpgradeSimulations/L1TrackTriggerObjects/interface/L1TkElectronEtComparator.h"
 
 #include "DataFormats/Math/interface/deltaPhi.h"
 
@@ -163,7 +163,7 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
   
  if( !EGammaHandle.isValid() )
         {
-          LogError("L1TkElectronTrackProducer")
+          edm::LogError("L1TkElectronTrackProducer")
             << "\nWarning: L1EmParticleCollection with " << L1EGammaInputTag
             << "\nrequested in configuration, but not found in the event. Exit"
             << std::endl;
