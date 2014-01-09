@@ -170,6 +170,15 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
            return;
         }
 
+ if (!L1TkTrackHandle.isValid() ) {
+          edm::LogError("L1TkEmParticleProducer")
+            << "\nWarning: L1TkTrackCollectionType with " << L1TrackInputTag
+            << "\nrequested in configuration, but not found in the event. Exit."
+            << std::endl;
+           return;
+ }
+
+
   //std::cout << " # of EGamma " << EGammaHandle->size() << std::endl;
   //std::cout << " # of Tracks " << L1TkTrackHandle->size() << std::endl;
   int ieg = 0;
