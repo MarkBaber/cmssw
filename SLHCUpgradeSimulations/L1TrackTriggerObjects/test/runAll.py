@@ -91,7 +91,7 @@ process.L1TkPhotons = cms.EDProducer("L1TkEmParticleProducer",
                                                 # are considered. ETmin < 0 means that no cut is applied.
         RelativeIsolation = cms.bool( True ),   # default = True. The isolation variable is relative if True,
                                                 # else absolute.
-        IsoCut = cms.double( 0.2 ),             # Cut on the (Trk-based) isolation: only the L1TkEmParticle for which
+        IsoCut = cms.double( 0.1 ),             # Cut on the (Trk-based) isolation: only the L1TkEmParticle for which
                                                 # the isolation is below RelIsoCut are written into
                                                 # the output collection. When RelIsoCut < 0, no cut is applied.
                                                 # When RelativeIsolation = False, IsoCut is in GeV.
