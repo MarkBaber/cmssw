@@ -170,8 +170,8 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
            return;
         }
 
-  std::cout << " # of EGamma " << EGammaHandle->size() << std::endl;
-  std::cout << " # of Tracks " << L1TkTrackHandle->size() << std::endl;
+  //std::cout << " # of EGamma " << EGammaHandle->size() << std::endl;
+  //std::cout << " # of Tracks " << L1TkTrackHandle->size() << std::endl;
   int ieg = 0;
   for (egIter = eGammaCollection.begin();  egIter != eGammaCollection.end(); ++egIter) {
     edm::Ref< L1EmParticleCollection > EGammaRef( EGammaHandle, ieg );
@@ -188,8 +188,6 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     if (fabs(eta_ele) > 2.5) continue;
     if (ETmin > 0.0 && et_ele <= ETmin) continue;
     // match the L1EG object with a L1Track
-    // here dummy : I simply take the closest track
-    // and require that DR < 0.5
     float drmin = 999;
     int itr = 0;
     int itrack = -1;
