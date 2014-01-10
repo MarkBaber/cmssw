@@ -45,8 +45,7 @@ HitMatchingAlgorithm_window2013_PixelDigi_ = cms.ESProducer("HitMatchingAlgorith
 
 # Tab2013 hit matching algorithm
 HitMatchingAlgorithm_tab2013_PixelDigi_ = cms.ESProducer("HitMatchingAlgorithm_tab2013_PixelDigi_",
-   #zMatching = cms.bool(True),
-   zMatching = cms.bool(False),
+   zMatching = cms.bool(True),
    BarrelCut = cms.vdouble( 0, 2.5, 2.5, 3.0, 4.5, 5.5, 7.0 ), #Use 0 as dummy to have direct access using DetId to the correct element
    EndcapCutSet = cms.VPSet(
      cms.PSet( EndcapCut = cms.vdouble( 0 ) ), #Use 0 as dummy to have direct access using DetId to the correct element
