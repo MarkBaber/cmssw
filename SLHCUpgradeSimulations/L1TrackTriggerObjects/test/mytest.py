@@ -21,8 +21,9 @@ from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-   '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/Hgaga/BE5D/zmatchingOff/m1_Hgaga_BE5D.root',
-   '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/Hgaga/BE5D/zmatchingOff/m2_Hgaga_BE5D.root'
+   #'/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/Hgaga/BE5D/zmatchingOff/m1_Hgaga_BE5D.root',
+   #'/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/Hgaga/BE5D/zmatchingOff/m2_Hgaga_BE5D.root'
+    '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/MinBias/BE5D/zmatchingOff/m1_MinBias_BE5D.root'
     )
 )
 
