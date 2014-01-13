@@ -26,7 +26,7 @@ process.source = cms.Source("PoolSource",
    fileNames = file_names,
    skipEvents = cms.untracked.uint32(0) 
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
 
 # ---- Global Tag and geometry :
 #      (needed e.g. when running raw2digi below)
@@ -42,7 +42,14 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS261_V3::All', '')
 
+
+# ---- redo the stubs :
+process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
+process.pStubs = cms.Path( process.L1TkStubsFromPixelDigis )
+
 # L1Tracking 
+process.load('IOMC.EventVertexGenerators.VtxSmearedGauss_cfi')
+
 process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
 process.load('Geometry.TrackerGeometryBuilder.StackedTrackerGeometry_cfi')
 process.load("SLHCUpgradeSimulations.L1TrackTrigger.L1TTrack_cfi")
@@ -106,6 +113,7 @@ process.L1TkElectrons = cms.EDProducer("L1TkElectronTrackProducer",
                                                 # are considered. ETmin < 0 means that no cut is applied.
         TrackEGammaDeltaPhi = cms.double(0.1),  # Delta Phi cutoff to match Track with L1EG objects
         TrackEGammaDeltaR = cms.double(0.06),   # Delta R cutoff to match Track with L1EG objects
+        #TrackEGammaDeltaR = cms.double(0.1), 
         TrackEGammaDeltaEta = cms.double(0.05), # Delta Eta cutoff to match Track with L1EG objects
                                                 # are considered. ETmin < 0 means that no cut is applied.
 	RelativeIsolation = cms.bool( True ),	# default = True. The isolation variable is relative if True,
@@ -137,6 +145,11 @@ process.Out.outputCommands.append( 'keep *_genParticles_*_*')
 #process.Out.outputCommands.append( 'keep *_L1TkElectrons_ElecTrk_*' )
 #process.Out.outputCommands.append( 'keep SimTracks_g4SimHits_*_*'), 
 process.Out.outputCommands.append('keep *_generator_*_*')
+process.Out.outputCommands.append('keep *_L1TkStubsFromPixelDigis_StubsPass_*')
+process.Out.outputCommands.append('keep *_L1Tracks_Level1TkTracks_*')
+process.Out.outputCommands.append('keep *_L1Tracks_L1TkStubs_*')
+
+
 #process.Out.outputCommands.append('keep *')
 
 #process.schedule = cms.Schedule(process.p0,process.L1Reco,process.TT_step,process.pElectrons)
