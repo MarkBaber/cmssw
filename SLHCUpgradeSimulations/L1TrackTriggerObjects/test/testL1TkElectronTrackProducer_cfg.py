@@ -4,6 +4,10 @@ process = cms.Process("Ele")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
+
+from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import *
+
+
 ################################################################################
 # Example configuratiom file : 
 # Here we run the L1EG algorithms (old stage-2 and new clustering),
@@ -14,19 +18,19 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 ################################################################################
 # list of files
 file_names = cms.untracked.vstring(
- '/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/00D6C34E-0339-E311-836A-002618943880.root',
- '/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/FEDB1C0F-FF38-E311-A659-0025905938D4.root')
-  #'root://eoscms//store/mc/UpgFall13d/Neutrino_Pt2to20_gun/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/008E2E98-0A39-E311-833F-0025905938D4.root',
-  #'root://eoscms//store/mc/UpgFall13d/Neutrino_Pt2to20_gun/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/027029F2-FE38-E311-ACD6-003048678B34.root'
-# '/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/00D6C34E-0339-E311-836A-002618943880.root',
-# '/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/FEDB1C0F-FF38-E311-A659-0025905938D4.root'
-#)
+ #'/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/00D6C34E-0339-E311-836A-002618943880.root',
+ #'/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/FEDB1C0F-FF38-E311-A659-0025905938D4.root')
+    '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST_forElec/SingleElectron/BE5D/zmatchingOff/L1TkElectrons_SingleElectron_BE5D_v0.root'
+)
+
+#file_names = singleElectronFiles
+
 # input Events 
 process.source = cms.Source("PoolSource",
    fileNames = file_names,
    skipEvents = cms.untracked.uint32(0) 
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(300) )
 
 # ---- Global Tag and geometry :
 #      (needed e.g. when running raw2digi below)
@@ -111,11 +115,17 @@ process.L1TkElectrons = cms.EDProducer("L1TkElectronTrackProducer",
                                                 #     ("SLHCL1ExtraParticlesNewClustering","EGamma").
         ETmin = cms.double( -1.0 ),       # Only the L1EG objects that have ET > ETmin in GeV
                                                 # are considered. ETmin < 0 means that no cut is applied.
-        TrackEGammaDeltaPhi = cms.double(0.1),  # Delta Phi cutoff to match Track with L1EG objects
-        TrackEGammaDeltaR = cms.double(0.06),   # Delta R cutoff to match Track with L1EG objects
-        #TrackEGammaDeltaR = cms.double(0.1), 
-        TrackEGammaDeltaEta = cms.double(0.05), # Delta Eta cutoff to match Track with L1EG objects
+   # Atanu's v1 :
+        #TrackEGammaDeltaPhi = cms.double(0.1),  # Delta Phi cutoff to match Track with L1EG objects
+        #TrackEGammaDeltaR = cms.double(0.06),   # Delta R cutoff to match Track with L1EG objects
+        #TrackEGammaDeltaEta = cms.double(0.05), # Delta Eta cutoff to match Track with L1EG objects
                                                 # are considered. ETmin < 0 means that no cut is applied.
+   # Jelena's cuts :
+        #TrackEGammaDeltaPhi = cms.double(0.08),
+	TrackEGammaDeltaPhi = cms.double(0.2),
+	#TrackEGammaDeltaR = cms.double(0.1),
+	TrackEGammaDeltaR = cms.double(0.2),
+	TrackEGammaDeltaEta = cms.double(9999.),
 	RelativeIsolation = cms.bool( True ),	# default = True. The isolation variable is relative if True,
 						# else absolute.
         IsoCut = cms.double( -0.15 ), 		# Cut on the (Trk-based) isolation: only the L1TkEmParticle for which
@@ -133,6 +143,11 @@ process.L1TkElectrons = cms.EDProducer("L1TkElectronTrackProducer",
 )
 process.pElectrons = cms.Path( process.L1TkElectrons )
 
+process.L1TkElectronsLoose = process.L1TkElectrons.clone()
+process.L1TkElectronsLoose.TrackEGammaDeltaPhi = cms.double(9999.)
+process.L1TkElectronsLoose.TrackEGammaDeltaR = cms.double(9999.)
+process.pElectronsLoose = cms.Path( process.L1TkElectronsLoose )
+
 process.Out = cms.OutputModule( "PoolOutputModule",
     fileName = cms.untracked.string( "L1TrackElectron.root" ),
     fastCloning = cms.untracked.bool( False ),
@@ -141,6 +156,7 @@ process.Out = cms.OutputModule( "PoolOutputModule",
 
 process.Out.outputCommands.append( 'keep *_SLHCL1ExtraParticles_EGamma_*' )
 process.Out.outputCommands.append( 'keep *_L1TkElectrons_*_*' )
+process.Out.outputCommands.append( 'keep *_L1TkElectronsLoose_*_*' )
 process.Out.outputCommands.append( 'keep *_genParticles_*_*')
 #process.Out.outputCommands.append( 'keep *_L1TkElectrons_ElecTrk_*' )
 #process.Out.outputCommands.append( 'keep SimTracks_g4SimHits_*_*'), 
@@ -148,6 +164,8 @@ process.Out.outputCommands.append('keep *_generator_*_*')
 process.Out.outputCommands.append('keep *_L1TkStubsFromPixelDigis_StubsPass_*')
 process.Out.outputCommands.append('keep *_L1Tracks_Level1TkTracks_*')
 process.Out.outputCommands.append('keep *_L1Tracks_L1TkStubs_*')
+process.Out.outputCommands.append('keep *_g4SimHits_TrackerHitsPixelBarrelLowTof_*')
+process.Out.outputCommands.append('keep *_g4SimHits_TrackerHitsPixelBarrelHighTof_*')
 
 
 #process.Out.outputCommands.append('keep *')
@@ -155,7 +173,7 @@ process.Out.outputCommands.append('keep *_L1Tracks_L1TkStubs_*')
 #process.schedule = cms.Schedule(process.p0,process.L1Reco,process.TT_step,process.pElectrons)
 process.FEVToutput_step = cms.EndPath(process.Out)
 
-process.schedule = cms.Schedule(process.pSLHCCalo,process.L1Reco,process.TT_step,process.pElectrons,process.FEVToutput_step)
+process.schedule = cms.Schedule(process.pSLHCCalo,process.L1Reco,process.TT_step,process.pElectrons,process.pElectronsLoose, process.FEVToutput_step)
 
 
 

@@ -27,8 +27,8 @@
   <class name="edm::reftobase::Holder<reco::Candidate, edm::Ref<std::vector<l1extra::L1TkEmParticle>,l1extra::L1TkEmParticle,edm::refhelper::FindUsingAdvance<std::vector<l1extra::L1TkEmParticle>,l1extra::L1TkEmParticle> > >" />
 -->
 
-  <class name="l1extra::L1TkElectronParticle" ClassVersion="12">
-   <version ClassVersion="12" checksum="120654014"/>
+  <class name="l1extra::L1TkElectronParticle" ClassVersion="14">
+   <version ClassVersion="14" checksum="2433769902"/>
   </class>
   <class name="std::vector<l1extra::L1TkElectronParticle>"/>
   <class name="edm::Wrapper<std::vector<l1extra::L1TkElectronParticle> >"/>

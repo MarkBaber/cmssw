@@ -200,6 +200,13 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     float drmin = 999;
     int itr = 0;
     int itrack = -1;
+
+    // temporary stuff:
+    float tmp_dphi = -999;
+    float tmp_deta = -999;
+    float tmp_dr = -999;
+    float tmp_dphiprime = -999;
+
     for (trackIter = L1TkTrackHandle->begin(); trackIter != L1TkTrackHandle->end(); ++trackIter) {
       edm::Ptr< L1TkTrackType > L1TrackPtr( L1TkTrackHandle, itr) ;
       if ( L1TrackPtr->getMomentum().perp() > PTMINTRA && L1TrackPtr->getChi2() < CHI2MAX) {
@@ -207,11 +214,18 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	double dPhi = 99.;
 	float dR = 99.;
 	float dEta = 99.;   
-	L1TkElectronTrackMatchAlgo::doMatch(egIter, trackIter, dPhi, dR, dEta); 
+
+	float dPhiPrime = 99;
+
+	L1TkElectronTrackMatchAlgo::doMatch(egIter, trackIter, dPhi, dR, dEta, dPhiPrime); 
           
 	if (fabs(dPhi) < dPhiCutoff && dR < dRCutoff && fabs(dEta) < dEtaCutoff && dR < drmin) {
 	  drmin = dR;
 	  itrack = itr;
+	  tmp_dphi = dPhi ;
+	  tmp_deta = dEta;
+	  tmp_dr = dR ;
+	  tmp_dphiprime = dPhiPrime;
 	}
       }
       itr++;
@@ -223,16 +237,27 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
       float pz = matchedL1TrackPtr->getMomentum().z();
       float e = sqrt( px*px + py*py + pz*pz );	// massless particle
 
+      //float rinv = matchedL1TrackPtr->getRInv();
+      //std::cout << " a track with rinv e = " << rinv << " " << e << std::endl;
       
-      math::XYZTLorentzVector TrackP4(px,py,pz,e);
+       math::XYZTLorentzVector TrackP4(px,py,pz,e);
       
+	// EP : keep the L1EG kinematics instead...
+        const math::XYZTLorentzVector P4 = egIter -> p4() ;
+	TrackP4 = P4;
+
       float trkisol = isolation(L1TkTrackHandle, itrack);
+
+	// EP : keep the L1EG kinematics instead...
+	trkisol = trkisol * sqrt(px*px + py*py)  / et_ele  ;
       
       L1TkElectronParticle trkEm( TrackP4, 
 				  EGammaRef,
 				  matchedL1TrackPtr, 
 				  trkisol );
       
+	trkEm.setDeltas(tmp_dphi, tmp_dphiprime, tmp_deta, tmp_dr );
+
       if (IsoCut <= 0) {
 	// write the L1TkEm particle to the collection, 
 	// irrespective of its relative isolation

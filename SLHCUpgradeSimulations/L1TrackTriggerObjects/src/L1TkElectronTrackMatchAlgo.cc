@@ -26,11 +26,15 @@
 #include "SLHCUpgradeSimulations/L1TrackTriggerObjects/interface/L1TkElectronTrackMatchAlgo.h"
 namespace L1TkElectronTrackMatchAlgo {
   // ------------ match EGamma and Track
-  void doMatch(l1extra::L1EmParticleCollection::const_iterator egIter, L1TkTrackCollectionType::const_iterator trkIter, double& dph, float&  dr, float& deta) {
+  void doMatch(l1extra::L1EmParticleCollection::const_iterator egIter, L1TkTrackCollectionType::const_iterator trkIter, double& dph, float&  dr, float& deta, float& dphiprime) {
     GlobalPoint egPos = L1TkElectronTrackMatchAlgo::calorimeterPosition(egIter->phi(), egIter->eta(), egIter->energy());
     dph  = L1TkElectronTrackMatchAlgo::deltaPhi(egPos, trkIter);
     dr   = L1TkElectronTrackMatchAlgo::deltaR(egPos, trkIter);
     deta = L1TkElectronTrackMatchAlgo::deltaEta(egPos, trkIter);
+
+    dphiprime = L1TkElectronTrackMatchAlgo::deltaPhiPrime(egPos, trkIter);
+    //dphiplus = L1TkElectronTrackMatchAlgo::deltaPhiPlus(egPos, trkIter);
+    //dphiminus  = L1TkElectronTrackMatchAlgo::deltaPhiMinus(egPos, trkIter);
   }
   // --------------- calculate deltaR between Track and EGamma object
 double deltaPhi(GlobalPoint epos, L1TkTrackCollectionType::const_iterator trkIter){
@@ -49,6 +53,53 @@ double deltaPhi(GlobalPoint epos, L1TkTrackCollectionType::const_iterator trkIte
     else return dif2; 
   
   }
+
+double deltaPhiPrime(GlobalPoint epos, L1TkTrackCollectionType::const_iterator trkIter){
+    double er = epos.perp();
+
+    // Using track fit curvature
+    //  double curv = 0.003 * magnetStrength * trk->getCharge()/ trk->getMomentum().perp(); 
+    double curv = trkIter->getRInv();
+    double x1 = (asin(er*curv/(2.0)));
+    double phi1 = reco::deltaPhi(trkIter->getMomentum().phi(), epos.phi());
+
+    double dif1 = phi1 - x1;
+    double dif2 = phi1 + x1;
+
+    double rinv = trkIter -> getRInv();
+    if (rinv < 0) return dif1;
+    return dif2;
+
+  }
+
+
+double deltaPhiPlus(GlobalPoint epos, L1TkTrackCollectionType::const_iterator trkIter){
+    double er = epos.perp();
+
+    // Using track fit curvature
+    //  double curv = 0.003 * magnetStrength * trk->getCharge()/ trk->getMomentum().perp(); 
+    double curv = trkIter->getRInv();
+    double x1 = (asin(er*curv/(2.0)));
+    double phi1 = reco::deltaPhi(trkIter->getMomentum().phi(), epos.phi());
+
+    double dif2 = phi1 + x1;
+    return dif2;
+}
+
+double deltaPhiMinus(GlobalPoint epos, L1TkTrackCollectionType::const_iterator trkIter){
+    double er = epos.perp();
+
+    // Using track fit curvature
+    //  double curv = 0.003 * magnetStrength * trk->getCharge()/ trk->getMomentum().perp(); 
+    double curv = trkIter->getRInv();
+    double x1 = (asin(er*curv/(2.0)));
+    double phi1 = reco::deltaPhi(trkIter->getMomentum().phi(), epos.phi());
+
+    double dif1 = phi1 - x1;
+    return dif1;
+}
+
+
 // --------------- calculate deltaPhi between Track and EGamma object                 
 float deltaR(GlobalPoint epos, L1TkTrackCollectionType::const_iterator trkIter){
     float dPhi = fabs(reco::deltaPhi(epos.phi(), trkIter->getMomentum().phi()));

@@ -50,10 +50,24 @@ namespace l1extra {
 
 	 void setTrkzVtx(float TrkzVtx)  { TrkzVtx_ = TrkzVtx ; }
 
+	// temporary stuff:
+	void setDeltas(float dphi, float dphi_prime, float deta, float dr) { dphi_ = dphi ;
+							   dphi_prime_ = dphi_prime;
+							   deta_ = deta ;
+							   dr_ = dr ; }
       private:
 
          edm::Ptr< L1TkTrackType > trkPtr_ ;
 	 float TrkzVtx_ ;
+
+	// temporary stuff:
+	float ptTra_ ;
+	int nStubs_ ;
+	float dphi_ ;
+	float dphi_prime_;
+	float deta_ ;
+	float dr_ ;
+	float chi2_ ;
 
     };
 }
