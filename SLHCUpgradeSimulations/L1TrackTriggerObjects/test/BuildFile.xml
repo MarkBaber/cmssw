@@ -7,7 +7,6 @@
 <use name="DataFormats/L1Trigger"/>
 <use name="DataFormats/L1TrackTrigger"/>
 <use name="SimDataFormats/SLHC"/>
-<use name="SLHCUpgradeSimulations/L1TrackTriggerObjects"/>
   <use   name="SimGeneral/HepPDTRecord"/>
   <use   name="SimDataFormats/GeneratorProducts"/>
   <use   name="PhysicsTools/UtilAlgos"/>

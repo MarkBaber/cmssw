@@ -201,12 +201,6 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     int itr = 0;
     int itrack = -1;
 
-    // temporary stuff:
-    float tmp_dphi = -999;
-    float tmp_deta = -999;
-    float tmp_dr = -999;
-    float tmp_dphiprime = -999;
-
     for (trackIter = L1TkTrackHandle->begin(); trackIter != L1TkTrackHandle->end(); ++trackIter) {
       edm::Ptr< L1TkTrackType > L1TrackPtr( L1TkTrackHandle, itr) ;
       if ( L1TrackPtr->getMomentum().perp() > PTMINTRA && L1TrackPtr->getChi2() < CHI2MAX) {
@@ -222,10 +216,6 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	if (fabs(dPhi) < dPhiCutoff && dR < dRCutoff && fabs(dEta) < dEtaCutoff && dR < drmin) {
 	  drmin = dR;
 	  itrack = itr;
-	  tmp_dphi = dPhi ;
-	  tmp_deta = dEta;
-	  tmp_dr = dR ;
-	  tmp_dphiprime = dPhiPrime;
 	}
       }
       itr++;
@@ -256,8 +246,6 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 				  matchedL1TrackPtr, 
 				  trkisol );
       
-	trkEm.setDeltas(tmp_dphi, tmp_dphiprime, tmp_deta, tmp_dr );
-
       if (IsoCut <= 0) {
 	// write the L1TkEm particle to the collection, 
 	// irrespective of its relative isolation
