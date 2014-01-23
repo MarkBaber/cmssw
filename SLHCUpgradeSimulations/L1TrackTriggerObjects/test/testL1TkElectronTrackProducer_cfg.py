@@ -1,12 +1,7 @@
-
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("Ele")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-
-
-from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import *
-
 
 ################################################################################
 # Example configuratiom file : 
@@ -18,19 +13,17 @@ from SLHCUpgradeSimulations.L1TrackTriggerObjects.singleElectronFiles_cfi import
 ################################################################################
 # list of files
 file_names = cms.untracked.vstring(
+ '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/MinBias/BE5D/m1_MinBias_BE5D.root')
+
  #'/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/00D6C34E-0339-E311-836A-002618943880.root',
  #'/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/FEDB1C0F-FF38-E311-A659-0025905938D4.root')
-    '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST_forElec/SingleElectron/BE5D/zmatchingOff/L1TkElectrons_SingleElectron_BE5D_v0.root'
-)
-
-#file_names = singleElectronFiles
-
+#)
 # input Events 
 process.source = cms.Source("PoolSource",
    fileNames = file_names,
    skipEvents = cms.untracked.uint32(0) 
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(300) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 # ---- Global Tag and geometry :
 #      (needed e.g. when running raw2digi below)
@@ -46,14 +39,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS261_V3::All', '')
 
-
-# ---- redo the stubs :
-process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
-process.pStubs = cms.Path( process.L1TkStubsFromPixelDigis )
-
 # L1Tracking 
-process.load('IOMC.EventVertexGenerators.VtxSmearedGauss_cfi')
-
 process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
 process.load('Geometry.TrackerGeometryBuilder.StackedTrackerGeometry_cfi')
 process.load("SLHCUpgradeSimulations.L1TrackTrigger.L1TTrack_cfi")
@@ -99,6 +85,7 @@ process.L1Reco = cms.Path( process.l1extraParticles )
 
 process.L1TkElectrons = cms.EDProducer("L1TkElectronTrackProducer",
         #label = cms.string("ElecTrk"),
+        L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
 	label = cms.string("EG"),	# labels the collection of L1TkEmParticleProducer that is produced.
                                         # e.g. EG or IsoEG if all objects are kept, or
                                         # EGIsoTrk or IsoEGIsoTrk if only the EG or IsoEG
@@ -113,40 +100,28 @@ process.L1TkElectrons = cms.EDProducer("L1TkElectronTrackProducer",
                                                 #   - for the new clustering algorithm of Jean-Baptiste et al,
                                                 #     use ("SLHCL1ExtraParticlesNewClustering","IsoEGamma") or
                                                 #     ("SLHCL1ExtraParticlesNewClustering","EGamma").
-        ETmin = cms.double( -1.0 ),       # Only the L1EG objects that have ET > ETmin in GeV
+        ETmin = cms.double( -1. ),	        # Only the L1EG objects that have ET > ETmin in GeV
                                                 # are considered. ETmin < 0 means that no cut is applied.
-   # Atanu's v1 :
-        #TrackEGammaDeltaPhi = cms.double(0.1),  # Delta Phi cutoff to match Track with L1EG objects
-        #TrackEGammaDeltaR = cms.double(0.06),   # Delta R cutoff to match Track with L1EG objects
-        #TrackEGammaDeltaEta = cms.double(0.05), # Delta Eta cutoff to match Track with L1EG objects
-                                                # are considered. ETmin < 0 means that no cut is applied.
-   # Jelena's cuts :
-        #TrackEGammaDeltaPhi = cms.double(0.08),
-	TrackEGammaDeltaPhi = cms.double(0.2),
-	#TrackEGammaDeltaR = cms.double(0.1),
-	TrackEGammaDeltaR = cms.double(0.2),
-	TrackEGammaDeltaEta = cms.double(9999.),
+	# Track selection :
+        CHI2MAX = cms.double( 100. ),
+        PTMINTRA = cms.double( 12. ),   # in GeV
+        TrackEGammaDeltaPhi = cms.double(0.08),  # Delta Phi cutoff to match Track with L1EG objects
+        TrackEGammaDeltaR = cms.double(0.08),   # Delta R cutoff to match Track with L1EG objects
+        TrackEGammaDeltaEta = cms.double(0.08), # Delta Eta cutoff to match Track with L1EG objects
+                                                # are considered. 
 	RelativeIsolation = cms.bool( True ),	# default = True. The isolation variable is relative if True,
 						# else absolute.
         IsoCut = cms.double( -0.15 ), 		# Cut on the (Trk-based) isolation: only the L1TkEmParticle for which
                                                 # the isolation is below RelIsoCut are written into
                                                 # the output collection. When RelIsoCut < 0, no cut is applied.
 						# When RelativeIsolation = False, IsoCut is in GeV.
+						# NOTE: TRKBASED-ISOLATION IS NOT READY TO USE YET.
         # Determination of the isolation w.r.t. L1Tracks :
-        L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
-	ZMAX = cms.double( 25. ),	# in cm
-	CHI2MAX = cms.double( 100. ),
-        PTMINTRA = cms.double( 5. ),	# in GeV
 	DRmin = cms.double( 0.06),
 	DRmax = cms.double( 0.5 ),
 	DeltaZ = cms.double( 1.0 )    # in cm. Used for tracks to be used isolation calculation
 )
 process.pElectrons = cms.Path( process.L1TkElectrons )
-
-process.L1TkElectronsLoose = process.L1TkElectrons.clone()
-process.L1TkElectronsLoose.TrackEGammaDeltaPhi = cms.double(9999.)
-process.L1TkElectronsLoose.TrackEGammaDeltaR = cms.double(9999.)
-process.pElectronsLoose = cms.Path( process.L1TkElectronsLoose )
 
 process.Out = cms.OutputModule( "PoolOutputModule",
     fileName = cms.untracked.string( "L1TrackElectron.root" ),
@@ -156,24 +131,16 @@ process.Out = cms.OutputModule( "PoolOutputModule",
 
 process.Out.outputCommands.append( 'keep *_SLHCL1ExtraParticles_EGamma_*' )
 process.Out.outputCommands.append( 'keep *_L1TkElectrons_*_*' )
-process.Out.outputCommands.append( 'keep *_L1TkElectronsLoose_*_*' )
 process.Out.outputCommands.append( 'keep *_genParticles_*_*')
-#process.Out.outputCommands.append( 'keep *_L1TkElectrons_ElecTrk_*' )
-#process.Out.outputCommands.append( 'keep SimTracks_g4SimHits_*_*'), 
 process.Out.outputCommands.append('keep *_generator_*_*')
-process.Out.outputCommands.append('keep *_L1TkStubsFromPixelDigis_StubsPass_*')
-process.Out.outputCommands.append('keep *_L1Tracks_Level1TkTracks_*')
-process.Out.outputCommands.append('keep *_L1Tracks_L1TkStubs_*')
-process.Out.outputCommands.append('keep *_g4SimHits_TrackerHitsPixelBarrelLowTof_*')
-process.Out.outputCommands.append('keep *_g4SimHits_TrackerHitsPixelBarrelHighTof_*')
 
-
+#process.Out.outputCommands.append( 'keep *_L1TkElectrons_ElecTrk_*' )
+#process.Out.outputCommands.append( 'keep SimTracks_g4SimHits_*_*') 
 #process.Out.outputCommands.append('keep *')
 
-#process.schedule = cms.Schedule(process.p0,process.L1Reco,process.TT_step,process.pElectrons)
 process.FEVToutput_step = cms.EndPath(process.Out)
 
-process.schedule = cms.Schedule(process.pSLHCCalo,process.L1Reco,process.TT_step,process.pElectrons,process.pElectronsLoose, process.FEVToutput_step)
+process.schedule = cms.Schedule(process.pSLHCCalo,process.L1Reco,process.TT_step,process.pElectrons,process.FEVToutput_step)
 
 
 

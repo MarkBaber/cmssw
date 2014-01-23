@@ -91,7 +91,7 @@ class L1TkElectronTrackProducer : public edm::EDProducer {
          
 	float ETmin; 	// min ET in GeV of L1EG objects
 
-	float ZMAX;		// |z_track| < ZMAX in cm
+	//float ZMAX;		// |z_track| < ZMAX in cm
 	float CHI2MAX;		
 	float DRmin;
 	float DRmax;
@@ -125,10 +125,10 @@ L1TkElectronTrackProducer::L1TkElectronTrackProducer(const edm::ParameterSet& iC
 
    ETmin = (float)iConfig.getParameter<double>("ETmin");
 
-   // parameters for the calculation of the isolation :
-   ZMAX = (float)iConfig.getParameter<double>("ZMAX");
+   //ZMAX = (float)iConfig.getParameter<double>("ZMAX");
    CHI2MAX = (float)iConfig.getParameter<double>("CHI2MAX");
    PTMINTRA = (float)iConfig.getParameter<double>("PTMINTRA");
+	// for the calculation of the isolation variable :
    DRmin = (float)iConfig.getParameter<double>("DRmin");
    DRmax = (float)iConfig.getParameter<double>("DRmax");
    DeltaZ = (float)iConfig.getParameter<double>("DeltaZ");
@@ -161,26 +161,21 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
   iEvent.getByLabel(L1TrackInputTag, L1TkTrackHandle);
   L1TkTrackCollectionType::const_iterator trackIter;
   
- if( !EGammaHandle.isValid() )
-        {
-          edm::LogError("L1TkElectronTrackProducer")
-            << "\nWarning: L1EmParticleCollection with " << L1EGammaInputTag
-            << "\nrequested in configuration, but not found in the event. Exit"
-            << std::endl;
-           return;
-        }
+  if( !EGammaHandle.isValid() ) {
+    edm::LogError("L1TkElectronTrackProducer")
+      << "\nWarning: L1EmParticleCollection with " << L1EGammaInputTag
+      << "\nrequested in configuration, but not found in the event. Exit"
+      << std::endl;
+    return;
+  }
+  if (!L1TkTrackHandle.isValid() ) {
+    edm::LogError("L1TkEmParticleProducer")
+      << "\nWarning: L1TkTrackCollectionType with " << L1TrackInputTag
+      << "\nrequested in configuration, but not found in the event. Exit."
+      << std::endl;
+    return;
+  }
 
- if (!L1TkTrackHandle.isValid() ) {
-          edm::LogError("L1TkEmParticleProducer")
-            << "\nWarning: L1TkTrackCollectionType with " << L1TrackInputTag
-            << "\nrequested in configuration, but not found in the event. Exit."
-            << std::endl;
-           return;
- }
-
-
-  //std::cout << " # of EGamma " << EGammaHandle->size() << std::endl;
-  //std::cout << " # of Tracks " << L1TkTrackHandle->size() << std::endl;
   int ieg = 0;
   for (egIter = eGammaCollection.begin();  egIter != eGammaCollection.end(); ++egIter) {
     edm::Ref< L1EmParticleCollection > EGammaRef( EGammaHandle, ieg );
@@ -188,7 +183,7 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
     int ibx = egIter -> bx();
     if (ibx != 0) continue;
-    
+
     float e_ele   = egIter->energy();
     float eta_ele = egIter->eta();
     float et_ele = 0;
@@ -200,19 +195,14 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     float drmin = 999;
     int itr = 0;
     int itrack = -1;
-
     for (trackIter = L1TkTrackHandle->begin(); trackIter != L1TkTrackHandle->end(); ++trackIter) {
       edm::Ptr< L1TkTrackType > L1TrackPtr( L1TkTrackHandle, itr) ;
-      if ( L1TrackPtr->getMomentum().perp() > PTMINTRA && L1TrackPtr->getChi2() < CHI2MAX) {
-   
+      if ( trackIter->getMomentum().perp() > PTMINTRA && trackIter->getChi2() < CHI2MAX) {
 	double dPhi = 99.;
-	float dR = 99.;
-	float dEta = 99.;   
+	double dR = 99.;
+	double dEta = 99.;   
+	L1TkElectronTrackMatchAlgo::doMatch(egIter, L1TrackPtr, dPhi, dR, dEta); 
 
-	float dPhiPrime = 99;
-
-	L1TkElectronTrackMatchAlgo::doMatch(egIter, trackIter, dPhi, dR, dEta, dPhiPrime); 
-          
 	if (fabs(dPhi) < dPhiCutoff && dR < dRCutoff && fabs(dEta) < dEtaCutoff && dR < drmin) {
 	  drmin = dR;
 	  itrack = itr;
@@ -222,26 +212,11 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     }
     if (itrack >= 0)  {
       edm::Ptr< L1TkTrackType > matchedL1TrackPtr(L1TkTrackHandle, itrack);      
-      float px = matchedL1TrackPtr->getMomentum().x();
-      float py = matchedL1TrackPtr->getMomentum().y();
-      float pz = matchedL1TrackPtr->getMomentum().z();
-      float e = sqrt( px*px + py*py + pz*pz );	// massless particle
-
-      //float rinv = matchedL1TrackPtr->getRInv();
-      //std::cout << " a track with rinv e = " << rinv << " " << e << std::endl;
       
-       math::XYZTLorentzVector TrackP4(px,py,pz,e);
-      
-	// EP : keep the L1EG kinematics instead...
-        const math::XYZTLorentzVector P4 = egIter -> p4() ;
-	TrackP4 = P4;
-
+      const math::XYZTLorentzVector P4 = egIter -> p4() ;      
       float trkisol = isolation(L1TkTrackHandle, itrack);
-
-	// EP : keep the L1EG kinematics instead...
-	trkisol = trkisol * sqrt(px*px + py*py)  / et_ele  ;
       
-      L1TkElectronParticle trkEm( TrackP4, 
+      L1TkElectronParticle trkEm( P4, 
 				  EGammaRef,
 				  matchedL1TrackPtr, 
 				  trkisol );
@@ -255,15 +230,14 @@ L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 	// if it passes the isolation cut
 	if (trkisol <= IsoCut) result -> push_back( trkEm );
       }
-      
+     
     }
-
+   
   } // end loop over EGamma objects
   
   iEvent.put( result, label );
 
 }
-
 
 // ------------ method called once each job just before starting event loop  ------------
 void

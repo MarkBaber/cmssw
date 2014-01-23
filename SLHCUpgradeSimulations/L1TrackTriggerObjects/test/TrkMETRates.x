@@ -12,9 +12,9 @@ float x1 = 0.;
 float x2 = 100.;
 
 TH1F* h1 = new TH1F("hTrkMET",";Missing ET (GeV); Events",nbins,x1,x2);
-TH1F* h1int = new TH1F("hTrkMETint",";Missing ET (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* h1int = new TH1F("hTrkMETint",";Missing ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
 TH1F* h2 = new TH1F("hMET",";Missing ET (GeV); Events",nbins,x1,x2);
-TH1F* h2int = new TH1F("hMETint",";Missing ET (GeV); Rate (kHz)",nbins,x1,x2);
+TH1F* h2int = new TH1F("hMETint",";Missing ET threshold (GeV); Rate (kHz)",nbins,x1,x2);
 
 Events -> Draw("l1extraL1TkEtMissParticles_L1TkEtMiss_MET_ALL.obj.pt_[0]>>hTrkMET");
 Events -> Draw("l1extraL1EtMissParticles_l1extraParticles_MET_ALL.obj.pt_[0]>>hMET");
