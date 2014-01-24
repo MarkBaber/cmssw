@@ -5,25 +5,26 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 
 ################################################################################
 # Example configuratiom file : 
+#
 # Here we run the L1EG algorithms (old stage-2 and new clustering),
-# we unpack the L1EG objects that were created during the L1 step
-# of the central production (i.e. the Run-1 algorithms), and we
-# create L1TkEm objects corresponding to the various input
-# collections.                                                                            
+# and we create L1TkElectron objects starting from the "old stage-2" L1EGs.
+#
+# The L1Tracking is also run here.
+#
 ################################################################################
+
 # list of files
 file_names = cms.untracked.vstring(
- '/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/MinBias/BE5D/m1_MinBias_BE5D.root')
-
- #'/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/00D6C34E-0339-E311-836A-002618943880.root',
- #'/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/FEDB1C0F-FF38-E311-A659-0025905938D4.root')
+ #'/store/cmst3/user/eperez/L1TrackTrigger/612_SLHC6/muDST/MinBias/BE5D/m1_MinBias_BE5D.root')
+ '/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/00D6C34E-0339-E311-836A-002618943880.root',
+ '/store/mc/UpgFall13d/SingleElectronFlatPt0p2To50/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/FEDB1C0F-FF38-E311-A659-0025905938D4.root')
 #)
 # input Events 
 process.source = cms.Source("PoolSource",
    fileNames = file_names,
    skipEvents = cms.untracked.uint32(0) 
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 
 # ---- Global Tag and geometry :
 #      (needed e.g. when running raw2digi below)
@@ -38,6 +39,18 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS261_V3::All', '')
+
+# ---------------------------------------------------------------------------
+#
+# ---- Run the L1Tracking :
+
+# ---- redo the stubs. Stubs were produced during the central production
+#      and are present on the DIGI files, but the "z-matching" condition
+#      was enforced. Here we redo the stubs without the z-matching.
+#      This leads to better tracking efficiencies.
+
+process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
+process.pStubs = cms.Path( process.L1TkStubsFromPixelDigis )
 
 # L1Tracking 
 process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
@@ -73,8 +86,8 @@ process.L1CaloTowerProducer.HCALDigis =  cms.InputTag("valHcalTriggerPrimitiveDi
 
 # run L1Reco to produce the L1EG objects corresponding
 # to the current trigger
-process.load('Configuration.StandardSequences.L1Reco_cff')
-process.L1Reco = cms.Path( process.l1extraParticles )
+#process.load('Configuration.StandardSequences.L1Reco_cff')
+#process.L1Reco = cms.Path( process.l1extraParticles )
 
 # ---------------------------------------------------------------------------
 #
@@ -140,7 +153,7 @@ process.Out.outputCommands.append('keep *_generator_*_*')
 
 process.FEVToutput_step = cms.EndPath(process.Out)
 
-process.schedule = cms.Schedule(process.pSLHCCalo,process.L1Reco,process.TT_step,process.pElectrons,process.FEVToutput_step)
+process.schedule = cms.Schedule(process.pSLHCCalo,process.TT_step,process.pElectrons,process.FEVToutput_step)
 
 
 
