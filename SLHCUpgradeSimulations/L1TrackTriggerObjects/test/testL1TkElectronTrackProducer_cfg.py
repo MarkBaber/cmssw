@@ -148,7 +148,7 @@ process.Out.outputCommands.append( 'keep *_genParticles_*_*')
 process.Out.outputCommands.append('keep *_generator_*_*')
 
 #process.Out.outputCommands.append( 'keep *_L1TkElectrons_ElecTrk_*' )
-#process.Out.outputCommands.append( 'keep SimTracks_g4SimHits_*_*') 
+process.Out.outputCommands.append( 'keep SimTracks_g4SimHits_*_*') 
 #process.Out.outputCommands.append('keep *')
 
 process.FEVToutput_step = cms.EndPath(process.Out)
