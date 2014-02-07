@@ -166,6 +166,8 @@ void BeamSpotFromSimProducer::produce(edm::Event& iEvent, const edm::EventSetup&
       meanY_ = ps.getParameterSet("VtxSmeared").getParameter<double>("MeanY");
       meanZ_ = ps.getParameterSet("VtxSmeared").getParameter<double>("MeanZ");
       
+    cout << " x y z sigmas " << meanX_ << " " << meanY_ << " " << meanZ_ << " " << " sigmas " << SigmaX << " " << SigmaY << " " << SigmaZ << endl;
+
       double HalfCrossingAngle = ps.getParameterSet("VtxSmeared").getParameter<double>("HalfCrossingAngle");
       double CrabAngle = ps.getParameterSet("VtxSmeared").getParameter<double>("CrabAngle");
       
