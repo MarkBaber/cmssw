@@ -35,6 +35,8 @@
 // for L1Tracks:
 #include "SimDataFormats/SLHC/interface/StackedTrackerTypes.h"
 
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+
 #include <string>
 #include "TMath.h"
 
@@ -68,7 +70,21 @@ class L1TkMuonParticleProducer : public edm::EDProducer {
 
       // ----------member data ---------------------------
 	
-	 edm::InputTag L1PLInputTag;  // inputTag for PierLuigi's objects
+	 //edm::InputTag L1PLInputTag;  // inputTag for PierLuigi's objects
+
+	 edm::InputTag L1MuonsInputTag;
+	 edm::InputTag L1TrackInputTag;	 
+
+	 float ETAMIN;
+	 float ETAMAX;
+        float ZMAX;             // |z_track| < ZMAX in cm
+        float CHI2MAX;
+        float PTMINTRA;
+        float DRmax;
+
+        int nStubsmin ;         // minimum number of stubs 
+
+	bool closest ;
 
 
 } ;
@@ -80,7 +96,19 @@ class L1TkMuonParticleProducer : public edm::EDProducer {
 L1TkMuonParticleProducer::L1TkMuonParticleProducer(const edm::ParameterSet& iConfig)
 {
 
-   L1PLInputTag = iConfig.getParameter<edm::InputTag>("L1PLInputTag");
+   //L1PLInputTag = iConfig.getParameter<edm::InputTag>("L1PLInputTag");
+
+   L1MuonsInputTag = iConfig.getParameter<edm::InputTag>("L1MuonsInputTag");
+   L1TrackInputTag = iConfig.getParameter<edm::InputTag>("L1TrackInputTag");
+
+   ETAMIN = (float)iConfig.getParameter<double>("ETAMIN");
+   ETAMAX = (float)iConfig.getParameter<double>("ETAMAX");
+   ZMAX = (float)iConfig.getParameter<double>("ZMAX");
+   CHI2MAX = (float)iConfig.getParameter<double>("CHI2MAX");
+   PTMINTRA = (float)iConfig.getParameter<double>("PTMINTRA");
+   DRmax = (float)iConfig.getParameter<double>("DRmax");
+  nStubsmin = iConfig.getParameter<int>("nStubsmin");
+  closest = iConfig.getParameter<bool>("closest");
 
    produces<L1TkMuonParticleCollection>();
 }
@@ -93,8 +121,117 @@ void
 L1TkMuonParticleProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
+   using namespace std;
+
 
  std::auto_ptr<L1TkMuonParticleCollection> result(new L1TkMuonParticleCollection);
+
+ // dummy code. I loop over the L1Muons and pick up the L1Track that is closest
+ // in DeltaR.
+
+  edm::Handle< vector<l1extra::L1MuonParticle>  > MuonHandle;
+  iEvent.getByLabel(L1MuonsInputTag,MuonHandle);
+  vector<l1extra::L1MuonParticle>::const_iterator l1MuIter;
+
+ edm::Handle<L1TkTrackCollectionType> L1TkTrackHandle;
+ iEvent.getByLabel(L1TrackInputTag, L1TkTrackHandle);
+ L1TkTrackCollectionType::const_iterator trackIter;
+
+
+  int imu = 0;
+  for (l1MuIter = MuonHandle->begin(); l1MuIter != MuonHandle->end(); ++l1MuIter) {
+
+    edm::Ref< L1MuonParticleCollection > MuRef( MuonHandle, imu );
+    imu ++;
+
+        float drmin = 999;
+        float ptmax = -1;
+	if (ptmax < 0) ptmax = -1;	// dummy
+
+      float eta = l1MuIter -> eta();
+      float phi = l1MuIter -> phi();
+
+      float feta = fabs( eta );
+      if (feta < ETAMIN) continue;
+      if (feta > ETAMAX) continue;
+
+      L1MuGMTExtendedCand cand = l1MuIter -> gmtMuonCand();
+      unsigned int quality = cand.quality();
+      int bx = l1MuIter -> bx() ;
+      if (bx != 0 ) continue;
+      if (quality < 3) continue;
+
+	// match the L1Muons with L1Tracks
+
+        int itr = -1;
+        int itrack = -1;
+        for (trackIter = L1TkTrackHandle->begin(); trackIter != L1TkTrackHandle->end(); ++trackIter) {
+	   itr ++ ;
+           float Pt = trackIter->getMomentum().perp();
+           float z  = trackIter->getVertex().z();
+           if (fabs(z) > ZMAX) continue;
+           if (Pt < PTMINTRA) continue;
+           float chi2 = trackIter->getChi2();
+           if (chi2 > CHI2MAX) continue;
+
+      	   std::vector< edm::Ptr< L1TkStub_PixelDigi_ > > theStubs = trackIter ->getStubPtrs();
+      	   int tmp_trk_nstub = (int) theStubs.size();
+      	   if ( tmp_trk_nstub < nStubsmin) continue;
+
+                float Eta = trackIter->getMomentum().eta();
+                float Phi = trackIter->getMomentum().phi();
+                float deta = eta - Eta;
+                float dphi = phi - Phi;
+                if (dphi < 0) dphi = dphi + 2.*TMath::Pi();
+                if (dphi > TMath::Pi()) dphi = 2.*TMath::Pi() - dphi;
+                float dR = sqrt( deta*deta + dphi*dphi );
+
+		if (closest) {
+			// take the closest track:
+                if (dR < drmin) {
+                  drmin = dR;
+                  itrack = itr;
+                }
+		}
+		else {
+			// or take the leading track within a cone 
+		if (dR < DRmax) {
+		  if (Pt > ptmax) {
+			ptmax = Pt;
+			itrack = itr;
+			drmin = dR;
+		  }
+		}
+		}
+
+        }  // end loop over the tracks
+
+        if (drmin < DRmax ) {     // found a L1Track matched to the L1Muon object
+
+            edm::Ptr< L1TkTrackType > L1TrackPtr( L1TkTrackHandle, itrack) ;
+
+            float px = L1TrackPtr -> getMomentum().x();
+            float py = L1TrackPtr -> getMomentum().y();
+            float pz = L1TrackPtr -> getMomentum().z(); 
+            float e = sqrt( px*px + py*py + pz*pz );    // massless particle
+            math::XYZTLorentzVector TrackP4(px,py,pz,e);
+            
+            float trkisol = -999;       // dummy
+            
+            L1TkMuonParticle trkMu( TrackP4,
+                                 MuRef,
+                                 L1TrackPtr,
+                                 trkisol );
+
+	    //trkMu.setDeltaR ( drmin ) ;
+            
+            result -> push_back( trkMu );
+
+        
+         }  // endif drmin < DRmax
+
+
+   }  // end loop over the L1Muons
 
 	// PL: the muon objects from PierLuigi
 /*

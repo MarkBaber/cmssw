@@ -9,7 +9,10 @@ process = cms.Process("L1EG")
 
 process.source = cms.Source("PoolSource",
    #fileNames = minBiasFiles_p1
-   fileNames = cms.untracked.vstring("root://eoscms///store/mc/UpgFall13d/Neutrino_Pt2to20_gun/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/008E2E98-0A39-E311-833F-0025905938D4.root")
+   fileNames = cms.untracked.vstring(
+     #"root://eoscms///store/mc/UpgFall13d/Neutrino_Pt2to20_gun/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/008E2E98-0A39-E311-833F-0025905938D4.root"
+    '/store/mc/UpgFall13d/HToTauTau_125_14TeV_powheg_pythia6/GEN-SIM-DIGI-RAW/PU140bx25_POSTLS261_V3-v1/20000/FAF4B2D5-0539-E311-B5C3-002618FDA279.root'
+   )
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
@@ -17,14 +20,19 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 # initialize MessageLogger and output report
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport = cms.untracked.PSet(
-    reportEvery = cms.untracked.int32(500),
+    #reportEvery = cms.untracked.int32(500),
+    reportEvery = cms.untracked.int32(10),
     limit = cms.untracked.int32(10000000)
 )      
        
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 
 # Load geometry
-process.load("Configuration.Geometry.GeometryIdeal_cff")
+#process.load("Configuration.Geometry.GeometryIdeal_cff")
+process.load('Configuration.Geometry.GeometryExtendedPhase2TkBE5DReco_cff')
+process.load('Configuration.Geometry.GeometryExtendedPhase2TkBE5D_cff')
+process.load('Geometry.TrackerGeometryBuilder.StackedTrackerGeometry_cfi')
+
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
                             
 from Configuration.AlCa.GlobalTag import GlobalTag
@@ -38,7 +46,7 @@ process.load("Configuration.StandardSequences.RawToDigi_Data_cff") ###check this
 process.load('Configuration.StandardSequences.L1Reco_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration/StandardSequences/EndOfProcess_cff')
-process.load('Configuration.Geometry.GeometryIdeal_cff')
+#process.load('Configuration.Geometry.GeometryIdeal_cff')
 process.load('Configuration/StandardSequences/MagneticField_AutoFromDBCurrent_cff')
 process.load("JetMETCorrections.Configuration.DefaultJEC_cff")
 

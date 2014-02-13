@@ -17,6 +17,9 @@
 
 #include "SimDataFormats/SLHC/interface/StackedTrackerTypes.h"
 
+#include "DataFormats/L1Trigger/interface/L1MuonParticle.h"
+#include "DataFormats/L1Trigger/interface/L1MuonParticleFwd.h"
+
 // PL :include PierLuigi's class
 // #include "....."
 
@@ -34,6 +37,7 @@ namespace l1extra {
 
 	 L1TkMuonParticle( const LorentzVector& p4,
 			    // const edm::Ref< XXXCollection >& muRef,     // reference to PL's object
+			     const edm::Ref< L1MuonParticleCollection >& muRef,
 			    const edm::Ptr< L1TkTrackType >& trkPtr,
 			    float tkisol = -999. );
 
@@ -58,15 +62,20 @@ namespace l1extra {
          void setTrkIsol(float TrkIsol)  { TrkIsol_ = TrkIsol ; }
          int bx() const;
 
+	  //void setDeltaR(float dr) { DeltaR_ = dr ; }
 
       private:
 
-         edm::Ptr< L1TkTrackType > trkPtr_ ;
 	// PL
          // edm::Ref< XXXCollection > muRef_ ;
+	 edm::Ref< L1MuonParticleCollection > muRef_ ;
+
+         edm::Ptr< L1TkTrackType > trkPtr_ ;
 
          float TrkIsol_;
 	 float TrkzVtx_ ;
+	
+	 //float DeltaR_ ;	// temporary
 
     };
 }

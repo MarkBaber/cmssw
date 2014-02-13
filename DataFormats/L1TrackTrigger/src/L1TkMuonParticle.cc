@@ -16,10 +16,11 @@ L1TkMuonParticle::L1TkMuonParticle()
 
 L1TkMuonParticle::L1TkMuonParticle( const LorentzVector& p4,
          // const edm::Ref< XXXCollection >& muRef,  // PL
+	 const edm::Ref< L1MuonParticleCollection > &muRef,
          const edm::Ptr< L1TkTrackType >& trkPtr,
 	 float tkisol )
    : LeafCandidate( ( char ) 0, p4 ),
-     // muRef_ ( muRef ) ,		// PL uncomment
+     muRef_ ( muRef ) ,		// PL uncomment
      trkPtr_ ( trkPtr ) ,
      TrkIsol_ ( tkisol )
 
