@@ -24,6 +24,9 @@
 #include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticle.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TkMuonParticleFwd.h"
 
+#include "DataFormats/L1TrackTrigger/interface/L1TkTauParticle.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkTauParticleFwd.h"
+
 #include "DataFormats/Common/interface/Wrapper.h"
 #include "DataFormats/Common/interface/RefVector.h"
 #include "DataFormats/Common/interface/RefProd.h"
@@ -80,7 +83,10 @@ namespace {
      edm::Wrapper<l1extra::L1TkMuonParticleCollection> w_trkmuColl;
      l1extra::L1TkMuonParticleRef reftrkMu ;
 
-
+        // L1TkTauParticle
+     l1extra::L1TkTauParticleCollection trktauColl ;
+     edm::Wrapper<l1extra::L1TkTauParticleCollection> w_trktauColl;
+     l1extra::L1TkTauParticleRef reftrkTau ;
 
 
   };
