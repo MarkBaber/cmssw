@@ -18,12 +18,14 @@ process.source = cms.Source("PoolSource",
 process.ana = cms.EDAnalyzer( 'L1TkElectronTrackObjectsAnalyzer' ,
     L1TkElectronsInputTag = cms.InputTag("L1TkElectrons","EG"),
     L1EGammaInputTag = cms.InputTag("SLHCL1ExtraParticles","EGamma"),
-    AnalysisOption   = cms.string("Efficiency")                              
+    AnalysisOption   = cms.string("Efficiency"),
+    EtaCutOff   = cms.double(2.5),
+    TrackPtCutOff   = cms.double(12.0)                                                                                          
 )
 
 
 # root file with histograms produced by the analyzer
-filename = "ana.root"
+filename = "analysis.root"
 process.TFileService = cms.Service("TFileService", fileName = cms.string(filename), closeFileFast = cms.untracked.bool(True)
 )
 
