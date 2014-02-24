@@ -31,9 +31,13 @@
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
 
 // for L1Tracks:
 #include "SimDataFormats/SLHC/interface/StackedTrackerTypes.h"
+
+// Matching Algorithm
+#include "SLHCUpgradeSimulations/L1TrackTriggerObjects/interface/L1TkElectronStubMatchAlgo.h"
 
 #include <string>
 #include "TMath.h"
@@ -48,8 +52,9 @@ using namespace l1extra ;
 class L1TkElectronStubsProducer : public edm::EDProducer {
    public:
 
+  typedef L1TkStub_PixelDigi_Collection::const_iterator L1TkStubIter;
   typedef L1TkTrack_PixelDigi_                          L1TkTrackType;
-  typedef std::vector< L1TkTrackType >                               L1TkTrackCollectionType;
+  typedef std::vector< L1TkTrackType >                  L1TkTrackCollectionType;
 
       explicit L1TkElectronStubsProducer(const edm::ParameterSet&);
       ~L1TkElectronStubsProducer();
@@ -69,23 +74,49 @@ class L1TkElectronStubsProducer : public edm::EDProducer {
       // ----------member data ---------------------------
 	edm::InputTag L1EGammaInputTag;
 	edm::InputTag L1TrackInputTag;
+	edm::InputTag L1StubInputTag;
+	edm::InputTag BeamSpotInputTag;
+        const edm::ParameterSet conf;
 	std::string label;
 
+	float ETmin; 	// min ET in GeV of L1EG objects
+
+	float DRmin;
+	float DRmax;
+	float PTMINTRA;
+	bool PrimaryVtxConstrain;	// use the primary vertex (default = false)
+	float DeltaZ;      	// | z_track - z_ref_track | < DeltaZ in cm. 
+				// Used only when PrimaryVtxConstrain = True.
+	float IsoCut;
+	bool RelativeIsolation;
 } ;
 
 
 //
 // constructors and destructor
 //
-L1TkElectronStubsProducer::L1TkElectronStubsProducer(const edm::ParameterSet& iConfig)
-{
+L1TkElectronStubsProducer::L1TkElectronStubsProducer(const edm::ParameterSet& iConfig) :
+  conf(iConfig)  {
 
-   L1EGammaInputTag = iConfig.getParameter<edm::InputTag>("L1EGammaInputTag") ;
-   L1TrackInputTag = iConfig.getParameter<edm::InputTag>("L1TrackInputTag");
-   label = iConfig.getParameter<std::string>("label");
-   
-
-   produces<L1TkElectronParticleCollection>(label);
+  L1EGammaInputTag = iConfig.getParameter<edm::InputTag>("L1EGammaInputTag") ;
+  L1TrackInputTag = iConfig.getParameter<edm::InputTag>("L1TrackInputTag");
+  L1StubInputTag = iConfig.getParameter<edm::InputTag>("L1StubInputTag");
+  BeamSpotInputTag = iConfig.getParameter<edm::InputTag>("BeamSpotInputTag");
+  label = iConfig.getParameter<std::string>("label");
+  
+  ETmin = (float)iConfig.getParameter<double>("ETmin");
+  
+  // parameters for the calculation of the isolation :
+  PTMINTRA = (float)iConfig.getParameter<double>("PTMINTRA");
+  DRmin = (float)iConfig.getParameter<double>("DRmin");
+  DRmax = (float)iConfig.getParameter<double>("DRmax");
+  DeltaZ = (float)iConfig.getParameter<double>("DeltaZ");
+  
+  // cut applied on the isolation (if this number is <= 0, no cut is applied)
+  IsoCut = (float)iConfig.getParameter<double>("IsoCut");
+  RelativeIsolation = iConfig.getParameter<bool>("RelativeIsolation");
+  
+  produces<L1TkElectronParticleCollection>(label);
 }
 
 L1TkElectronStubsProducer::~L1TkElectronStubsProducer() {
@@ -106,6 +137,15 @@ L1TkElectronStubsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
  edm::Handle<L1TkTrackCollectionType> L1TkTrackHandle;
  iEvent.getByLabel(L1TrackInputTag, L1TkTrackHandle);
  L1TkTrackCollectionType::const_iterator trackIter;
+
+ edm::Handle<L1TkStub_PixelDigi_Collection> L1TkStubHandle;
+ iEvent.getByLabel(L1StubInputTag, L1TkStubHandle);
+
+ edm::Handle<reco::BeamSpot> BeamSpotHandle;
+ // iEvent.getByLabel("BeamSpotFromSim", "BeamSpot", theBeamSpot);
+  iEvent.getByLabel(BeamSpotInputTag, BeamSpotHandle);
+  const GlobalPoint beamSpot(BeamSpotHandle->x0(),BeamSpotHandle->y0(),BeamSpotHandle->z0());
+ 
  if( !EGammaHandle.isValid() )
         {
           LogError("L1TkElectronStubsProducer")
@@ -117,35 +157,58 @@ L1TkElectronStubsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
  int ieg = 0;
  for (egIter = EGammaHandle->begin();  egIter != EGammaHandle->end(); ++egIter) {
-
-    edm::Ref< L1EmParticleCollection > EGammaRef( EGammaHandle, ieg );
+   
+   edm::Ref< L1EmParticleCollection > EGammaRef( EGammaHandle, ieg );
     ieg ++;
 
     int ibx = egIter -> bx();
     if (ibx != 0) continue;
 
-        float trkisol = -999;       // dummy
-        const math::XYZTLorentzVector P4 = egIter -> p4() ;
+    float e_ele   = egIter->energy();
+    float eta_ele = egIter->eta();
+    float et_ele = 0;
+    if (cosh(eta_ele) > 0.0) et_ele = e_ele/cosh(eta_ele);
+    else et_ele = -1.0;
+    if (fabs(eta_ele) > 2.5) continue;
+    if (ETmin > 0.0 && et_ele <= ETmin) continue;
 
-           edm::Ptr< L1TkTrackType > L1TrackPtrNull;     //  null pointer
-           L1TkElectronParticle trkEm( P4,
-                                 EGammaRef,
-                                 L1TrackPtrNull,  
-                                 trkisol );
+    unsigned int matchedStubs = L1TkElectronStubMatchAlgo::doMatch(egIter, L1TkStubHandle, conf, iSetup, beamSpot); 
+ 
+    if (matchedStubs > 0) {
 
-           	// then one can set the "z" of the electron, as determined by the 
-           	// algorithm, via :
-	   float z = -999; 	// dummy
-           trkEm.setTrkzVtx( z );
+      const math::XYZTLorentzVector P4 = egIter -> p4() ;
 
-	   result -> push_back( trkEm );
+      float trkisol = 0.0;
+      //	isolation(L1TkTrackHandle, itrack);
+      //      if (RelativeIsolation && et_ele > 0.0) {   // relative isolation
+      //	trkisol = trkisol  / et_ele;
+      //      }
+      edm::Ptr< L1TkTrackType > L1TrackPtrNull; // null pointer
 
+      L1TkElectronParticle trkEm( P4,
+				  EGammaRef,
+				  L1TrackPtrNull,
+				  trkisol );
 
- }  // end loop over EGamma objects
-
- iEvent.put( result, label );
+      if (IsoCut <= 0) {
+	// write the L1TkEm particle to the collection, 
+	// irrespective of its relative isolation
+	result -> push_back( trkEm );
+      }	
+      //else {
+	// the object is written to the collection only
+	// if it passes the isolation cut
+      //	if (trkisol <= IsoCut) result -> push_back( trkEm );
+      //      }
+     
+    }
+   
+  } // end loop over EGamma objects
+  
+  iEvent.put( result, label );
 
 }
+
 
 
 // ------------ method called once each job just before starting event loop  ------------
