@@ -73,6 +73,22 @@ process.L1TrackPrimaryVertex = cms.EDProducer('L1TrackPrimaryVertexProducer',
 
 process.p = cms.Path( process.L1TrackPrimaryVertex )
 
+#
+# Run the second primary vertex producer, L1TkFastPrimaryVertex, which
+# performs a simple peak finding
+#
+
+process.L1TkPrimaryVertex = cms.EDProducer('L1TkFastVertexProducer',
+     L1TrackInputTag = cms.InputTag("L1Tracks","Level1TkTracks"),
+     ZMAX = cms.double ( 25. ) ,        # in cm
+     CHI2MAX = cms.double( 100. ),
+     PTMINTRA = cms.double( 2.),        # PTMIN of L1Tracks, in GeV
+     nStubsmin = cms.int32( 4 ) ,       # minimum number of stubs
+     nStubsPSmin = cms.int32( 3 )       # minimum number of stubs in PS modules 
+)
+process.p2 = cms.Path( process.L1TkPrimaryVertex )
+
+
 process.Out = cms.OutputModule( "PoolOutputModule",
     fileName = cms.untracked.string( "example_w_Tracks_and_vertex.root" ),
     fastCloning = cms.untracked.bool( False ),
