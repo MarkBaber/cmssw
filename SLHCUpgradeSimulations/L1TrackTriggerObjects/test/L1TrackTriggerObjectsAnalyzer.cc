@@ -91,9 +91,9 @@ class L1TrackTriggerObjectsAnalyzer : public edm::EDAnalyzer {
 
 	// to test the L1TrackPrimaryVertex :
 	edm::InputTag L1VtxInputTag;
-	TH1F* h_zgen;
-	TH1F* h_dz1;
-	TH1F* h_dz2;
+	//TH1F* h_zgen;
+	//TH1F* h_dz1;
+	//TH1F* h_dz2;
 
 	// for L1TrackEtmiss:
 	edm::InputTag L1TkEtMissInputTag;
@@ -125,6 +125,7 @@ L1TrackTriggerObjectsAnalyzer::L1TrackTriggerObjectsAnalyzer(const edm::Paramete
 {
    //now do what ever initialization is needed
 
+/*
   edm::Service<TFileService> fs;
   int nbins = 25;
   float x1=-25.;
@@ -135,6 +136,7 @@ L1TrackTriggerObjectsAnalyzer::L1TrackTriggerObjectsAnalyzer(const edm::Paramete
    x2 = 2;
    h_dz1 = fs -> make<TH1F>("h_dz1",";z_{L1} - z_{gen} (cm); Evts",nbins,x1,x2);
    h_dz2 = fs -> make<TH1F>("h_dz2",";z_{L1} - z_{gen} (cm); Evts",nbins, x1, x2);
+*/
 
   L1VtxInputTag = iConfig.getParameter<edm::InputTag>("L1VtxInputTag") ;
   L1TkEtMissInputTag = iConfig.getParameter<edm::InputTag>("L1TkEtMissInputTag");
@@ -203,7 +205,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 
           }  // end loop over gen vertices
 
-     h_zgen -> Fill( zvtx_gen );
+     //h_zgen -> Fill( zvtx_gen );
      std::cout << " Generated zvertex : " << zvtx_gen << std::endl;
 
 
@@ -217,7 +219,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
  std::vector<L1TrackPrimaryVertex>::const_iterator vtxIter;
  
  if ( L1VertexHandle.isValid() ) {
-     std::cout << " -----  L1TrackPrimaryVertex objects   ----- " << std::endl;
+     std::cout << " -----  L1TrackPrimaryVertex   ----- " << std::endl;
      int ivtx = 0;
 	// several algorithms have been run in the L1TrackPrimaryVertexProducer
 	// hence there is a collection of L1 primary vertices.
@@ -228,8 +230,8 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
         float sum = vtxIter -> getSum();
         std::cout << " a vertex with  z = sum " << z << " " << sum << std::endl;
         ivtx ++;
-        if (ivtx == 1) h_dz1 -> Fill( z - zvtx_gen) ;
-        if (ivtx == 2) h_dz2 -> Fill( z - zvtx_gen);
+        //if (ivtx == 1) h_dz1 -> Fill( z - zvtx_gen) ;
+        //if (ivtx == 2) h_dz2 -> Fill( z - zvtx_gen);
      }  
  }
 
@@ -243,7 +245,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
  std::vector<L1TkEtMissParticle>::const_iterator etmIter;
 
  if (L1TkEtMissHandle.isValid() ) {
-    std::cout << " -----  L1TkEtMiss objects  -----  " << std::endl; 
+    std::cout << " -----  L1TkEtMiss   -----  " << std::endl; 
     for (etmIter = L1TkEtMissHandle -> begin(); etmIter != L1TkEtMissHandle->end(); ++etmIter) {
 	float etmis = etmIter -> et();
 	const edm::Ref< L1TrackPrimaryVertexCollection > vtxRef = etmIter -> getVtxRef();
@@ -273,11 +275,10 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 	float jetvtx = jetIter -> getJetVtx();
         const edm::Ref< L1JetParticleCollection > Jetref = jetIter -> getJetRef();
         float et_L1Jet = Jetref -> et();
-	L1JetParticle::JetType type = Jetref -> type();
+	//L1JetParticle::JetType type = Jetref -> type();  // requires to keep the GCT collection
 
         std::cout << " a Jet candidate ET eta phi zvertex " << et << " " << eta << " " << phi << " " << jetvtx  << std::endl;
-        std::cout << "                Calo  ET, typ " << et_L1Jet << " " << type << std::endl;
-        std::cout << "                bx = " << bx << std::endl;
+        std::cout << "                           Calo  ET " << et_L1Jet << " bx = " << bx << std::endl;
     }
  }
 
@@ -333,8 +334,7 @@ L1TrackTriggerObjectsAnalyzer::analyze(const edm::Event& iEvent, const edm::Even
 	float phi_calo = EGref -> phi();
 
 	std::cout << " a photon candidate ET eta phi trkisol " << et << " " << eta << " " << phi << " " << trkisol << std::endl;
-	std::cout << "                Calo  ET eta phi " << et_L1Calo << " " << eta_calo << " " << phi_calo << std::endl; 
-	std::cout << "                bx = " << bx << std::endl;
+	std::cout << "                Calo  ET eta phi " << et_L1Calo << " " << eta_calo << " " << phi_calo << " bx = " << bx << std::endl; 
     }
  }
 

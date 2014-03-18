@@ -7,7 +7,7 @@ L1TkElectrons = cms.EDProducer("L1TkElectronTrackProducer",
                                         # EGIsoTrk or IsoEGIsoTrk if only the EG or IsoEG
                                         # objects that pass a cut RelIso < RelIsoCut are written
                                         # into the new collection.
-        L1EGammaInputTag = cms.InputTag("SLHCL1ExtraParticles","EGamma"),      # input EGamma collection
+        L1EGammaInputTag = cms.InputTag("SLHCL1ExtraParticlesNewClustering","EGamma"),      # input EGamma collection
 					# When the standard sequences are used :
                                                 #   - for the Run-1 algo, use ("l1extraParticles","NonIsolated")
                                                 #     or ("l1extraParticles","Isolated")
@@ -34,7 +34,7 @@ L1TkElectrons = cms.EDProducer("L1TkElectronTrackProducer",
 						# When RelativeIsolation = False, IsoCut is in GeV.
         # Determination of the isolation w.r.t. L1Tracks :
         PTMINTRA = cms.double( 2. ),	# in GeV
-	DRmin = cms.double( 0.08),
-	DRmax = cms.double( 0.5 ),
-	DeltaZ = cms.double( 0.4 )    # in cm. Used for tracks to be used isolation calculation
+	DRmin = cms.double( 0.03),
+	DRmax = cms.double( 0.2 ),
+	DeltaZ = cms.double( 0.6 )    # in cm. Used for tracks to be used isolation calculation
 )
