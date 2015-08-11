@@ -1,5 +1,26 @@
 import FWCore.ParameterSet.Config as cms
 
+
+SUSY_HLT_HT200_alphaT0p57 = cms.EDAnalyzer("SUSY_HLT_alphaT",
+  trigSummary       = cms.InputTag("hltTriggerSummaryAOD",'', 'HLT'), #to use with test sample
+  TriggerResults    = cms.InputTag('TriggerResults','','HLT'), #to use with test sample
+  caloJetCollection = cms.InputTag("ak4CaloJets"),
+  pfJetCollection   = cms.InputTag("ak4PFJetsCHS"),
+  HLTProcess                      = cms.string('HLT'),
+  TriggerPath                     = cms.string('HLT_PFHT200_DiPFJetAve90_PFAlphaT0p63_v'),
+  TriggerPathAuxiliaryForHadronic = cms.string('HLT_IsoMu24_eta2p1_v'),
+  TriggerPreFilter                = cms.InputTag('hltHT175CaloAlphaT0p59', '', 'HLT'),
+  TriggerFilter                   = cms.InputTag('hltPFHT200PFAlphaT0p63', '', 'HLT'),
+  PtThrJet            = cms.untracked.double(40.0),
+  EtaThrJet           = cms.untracked.double(3.0),
+  caloHtThrTurnon     = cms.untracked.double(200),
+  caloAlphaTThrTurnon = cms.untracked.double(0.61),
+  pfHtThrTurnon       = cms.untracked.double(225),
+  pfAlphaTThrTurnon   = cms.untracked.double(0.65),
+)
+
+
+
 SUSY_HLT_HT200_alphaT0p63 = cms.EDAnalyzer("SUSY_HLT_alphaT",
   trigSummary = cms.InputTag("hltTriggerSummaryAOD",'', 'HLT'), #to use with test sample
   caloJetCollection = cms.InputTag("ak4CaloJets"),
