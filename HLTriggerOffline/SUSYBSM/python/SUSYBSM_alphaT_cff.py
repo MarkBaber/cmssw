@@ -222,7 +222,5 @@ SUSY_HLT_alphaT_POSTPROCESSING = cms.EDAnalyzer("DQMGenericClient",
     efficiency     = cms.vstring(
        "pfHtTurnOn_eff 'Turn-on vs PF HT; HT (GeV); #epsilon' pfHtTurnOn_num pfHtTurnOn_den",
        "pfAlphaTTurnOn_eff 'Turn-on vs PF alpha T; AlphaT (GeV); #epsilon' pfAlphaTTurnOn_num pfAlphaTTurnOn_den",
-       # "caloHtTurnOn_eff 'Turn-on vs Calo HT; HT (GeV); #epsilon' caloHtTurnOn_num caloHtTurnOn_den",
-       # "caloAlphaTTurnOn_eff 'Turn-on vs Calo alpha T; AlphaT (GeV); #epsilon' caloAlphaTTurnOn_num caloAlphaTTurnOn_den",
     )
 )
