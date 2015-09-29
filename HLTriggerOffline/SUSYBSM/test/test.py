@@ -47,7 +47,12 @@ process.out = cms.OutputModule("PoolOutputModule",
 )
 
 
-process.HLTAlphaTSeq = cms.Sequence(process.SUSY_HLT_HT200_alphaT0p57+
+process.HLTAlphaTSeq = cms.Sequence(process.SUSY_HLT_HT200_alphaT0p63+
+                                    process.SUSY_HLT_HT250_alphaT0p58+
+                                    process.SUSY_HLT_HT300_alphaT0p53+ 
+                                    process.SUSY_HLT_HT350_alphaT0p52+ 
+                                    process.SUSY_HLT_HT400_alphaT0p51+ 
+                                    process.SUSY_HLT_HT200_alphaT0p57+
                                     process.SUSY_HLT_HT250_alphaT0p55+
                                     process.SUSY_HLT_HT300_alphaT0p54+ 
                                     process.SUSY_HLT_HT350_alphaT0p53+ 
