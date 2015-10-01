@@ -33,14 +33,14 @@ SUSY_HLT_alphaT::~SUSY_HLT_alphaT()
 
 void SUSY_HLT_alphaT::dqmBeginRun(edm::Run const &run, edm::EventSetup const &e)
 {
- 
+  std::cout << "dqmBeginRun\n";
   bool changed;
-  
+    std::cout << "dqm1\n";
   if (!fHltConfig.init(run, e, HLTProcess_, changed)) {
     edm::LogError("SUSY_HLT_alphaT") << "Initialization of HLTConfigProvider failed!!";
     return;
   }
-
+    std::cout << "dqm2\n";
   bool pathFound = false;
   const std::vector<std::string> allTrigNames = fHltConfig.triggerNames();
   for(size_t j = 0; j <allTrigNames.size(); ++j) {
@@ -48,25 +48,27 @@ void SUSY_HLT_alphaT::dqmBeginRun(edm::Run const &run, edm::EventSetup const &e)
       pathFound = true;
     }
   }
-
+    std::cout << "dqm3\n";
   if(!pathFound) {
     LogDebug ("SUSY_HLT_alphaT") << "Path not found" << "\n";
     return;
   }
-
+    std::cout << "dqm4\n";
   edm::LogInfo("SUSY_HLT_alphaT") << "SUSY_HLT_alphaT::beginRun" << std::endl;
 }
 
  void SUSY_HLT_alphaT::bookHistograms(DQMStore::IBooker & ibooker_, edm::Run const &, edm::EventSetup const &)
 {
+  std::cout << "bookHistograms\n";
   edm::LogInfo("SUSY_HLT_alphaT") << "SUSY_HLT_alphaT::bookHistograms" << std::endl;
   //book at beginRun
   bookHistos(ibooker_);
+  std::cout << "END bookHistograms\n";
 }
 
 void SUSY_HLT_alphaT::beginLuminosityBlock(edm::LuminosityBlock const& lumiSeg,
   edm::EventSetup const& context)
-{
+{std::cout << "beginLuminosityBlock\n";
    edm::LogInfo("SUSY_HLT_alphaT") << "SUSY_HLT_alphaT::beginLuminosityBlock" << std::endl;
 }
 
@@ -74,7 +76,7 @@ void SUSY_HLT_alphaT::beginLuminosityBlock(edm::LuminosityBlock const& lumiSeg,
 
 void SUSY_HLT_alphaT::analyze(edm::Event const& e, edm::EventSetup const& eSetup){
   edm::LogInfo("SUSY_HLT_alphaT") << "SUSY_HLT_alphaT::analyze" << std::endl;
-
+  std::cout << "analyze\n";
   //-------------------------------
   //--- Trigger
   //-------------------------------
@@ -126,8 +128,10 @@ void SUSY_HLT_alphaT::analyze(edm::Event const& e, edm::EventSetup const& eSetup
       }
   }
   
+  std::cout << "1\n";
   //Fill the alphaT and HT histograms
   if(hltPfJets.size()>0){
+    std::cout << "2\n";
       double hltPfAlphaT = AlphaT(hltPfJets,true).value();
       h_triggerPfAlphaT->Fill(hltPfAlphaT);
       h_triggerPfHt->Fill(hltPfHt);
@@ -143,7 +147,7 @@ void SUSY_HLT_alphaT::analyze(edm::Event const& e, edm::EventSetup const& eSetup
       if (trigNames.triggerName(hltIndex).find(triggerPathAuxiliaryForHadronic_) != std::string::npos && hltresults->wasrun(hltIndex) && hltresults->accept(hltIndex)) hasFiredAuxiliaryForHadronicLeg = true;
 
   }
-
+  std::cout << "3\n";
   if(hasFiredAuxiliaryForHadronicLeg) {
 
       float pfHT = 0.0;
@@ -154,16 +158,18 @@ void SUSY_HLT_alphaT::analyze(edm::Event const& e, edm::EventSetup const& eSetup
        pfHT += i_pfjet->pt();
        LorentzV JetLVec(i_pfjet->pt(),i_pfjet->eta(),i_pfjet->phi(),i_pfjet->mass());
        pfJets.push_back(JetLVec);
+       std::cout << "4\n";
       }
 
       double pfAlphaT = AlphaT(pfJets).value();
 
       //Fill the turnons
       if(hasFired) {
+  std::cout << "5\n";
         if(pfHT>pfHtThrTurnon_) h_pfAlphaTTurnOn_num-> Fill(pfAlphaT);
         if(pfAlphaT>pfAlphaTThrTurnon_) h_pfHtTurnOn_num-> Fill(pfHT);
       } 
-
+  std::cout << "6\n";
       if(pfHT>pfHtThrTurnon_) h_pfAlphaTTurnOn_den-> Fill(pfAlphaT);
       if(pfAlphaT>pfAlphaTThrTurnon_) h_pfHtTurnOn_den-> Fill(pfHT);
   }
@@ -171,13 +177,13 @@ void SUSY_HLT_alphaT::analyze(edm::Event const& e, edm::EventSetup const& eSetup
 
 
 void SUSY_HLT_alphaT::endLuminosityBlock(edm::LuminosityBlock const& lumiSeg, edm::EventSetup const& eSetup)
-{
+{std::cout<<"EndLumiBlock\n";
   edm::LogInfo("SUSY_HLT_alphaT") << "SUSY_HLT_alphaT::endLuminosityBlock" << std::endl;
 }
 
 
 void SUSY_HLT_alphaT::endRun(edm::Run const& run, edm::EventSetup const& eSetup)
-{
+{std::cout<<"EndRun\n";
   edm::LogInfo("SUSY_HLT_alphaT") << "SUSY_HLT_alphaT::endRun" << std::endl;
 }
 
@@ -185,16 +191,6 @@ void SUSY_HLT_alphaT::bookHistos(DQMStore::IBooker & ibooker_)
 {
   ibooker_.cd();
   
-  std::cout << "PATH = " << triggerPath_ << "\n";
-  std::cout << "PATH = " << triggerPath_ << "\n";
-  std::cout << "PATH = " << triggerPath_ << "\n";
-  std::cout << "PATH = " << triggerPath_ << "\n";
-  std::cout << "PATH = " << triggerPath_ << "\n";
-  std::cout << "PATH = " << triggerPath_ << "\n";
-  std::cout << "PATH = " << triggerPath_ << "\n";
-  std::cout << "PATH = " << triggerPath_ << "\n";
-  std::cout << "PATH = " << triggerPath_ << "\n";
-  std::cout << "PATH = " << triggerPath_ << "\n";
   std::cout << "PATH = " << triggerPath_ << "\n";
   ibooker_.setCurrentFolder("HLT/SUSYBSM/" + triggerPath_);
 
@@ -213,6 +209,7 @@ void SUSY_HLT_alphaT::bookHistos(DQMStore::IBooker & ibooker_)
   h_pfHtTurnOn_den = ibooker_.book1D("pfHtTurnOn_den", "PF HT Turn On Denominator; HT (GeV)", 30, 0.0, 1500.0 );
 
   ibooker_.cd();
+  std::cout << "END bookHistos\n";
 }
 
 //define this as a plug-in
